@@ -11,10 +11,14 @@ load_dotenv()
 print(os.getcwd())
 IMG_PATH = os.path.join("src", "data", "em.jpg")
 assert os.path.exists(IMG_PATH), "Image not found"
+
 API_KEY = os.environ["ROBOFLOW_API_KEY"]
+assert API_KEY, "API key not found"
+
 DISTANCE_TO_OBJECT = 1000  # mm
 HEIGHT_OF_HUMAN_FACE = 250  # mm
-GAZE_DETECTION_URL = "http://127.0.0.1:9001/gaze/gaze_detection?api_key=" + API_KEY
+
+GAZE_DETECTION_URL = "http://localhost:9001/gaze/gaze_detection?api_key=" + API_KEY
 
 
 def detect_gazes(frame: np.ndarray):
@@ -27,6 +31,7 @@ def detect_gazes(frame: np.ndarray):
             "image": {"type": "base64", "value": img_base64.decode("utf-8")},
         },
     )
+    assert resp.status_code == 200, resp.text
     gazes = resp.json()[0]["predictions"]
     return gazes
 
