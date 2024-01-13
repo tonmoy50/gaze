@@ -161,3 +161,13 @@ cython_debug/
 
 *.png
 *.jpg
+*.model
+*.h5
+*.json
+*.csv
+*.txt
+*.tar
+*.dat
+*.npy
+*.pkl
+*.pth
