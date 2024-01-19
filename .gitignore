@@ -171,3 +171,4 @@ cython_debug/
 *.npy
 *.pkl
 *.pth
+*.DS_Store

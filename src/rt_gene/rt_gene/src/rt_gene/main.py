@@ -110,11 +110,11 @@ def estimate_gaze(base_name, color_img, dist_coefficients, camera_matrix):
         if args.save_headpose:
             # add idx to cope with multiple persons in one image
             cv2.imwrite(
-                # os.path.join(
-                #     args.output_path,
-                #     os.path.splitext(base_name)[0] + "_headpose_%s.jpg" % (idx),
-                # ),
-                "/Users/tonmoy/Desktop/" + "_headpose_%s.jpg" % (idx),
+                os.path.join(
+                    args.output_path,
+                    os.path.splitext(base_name)[0] + "_headpose_%s.jpg" % (idx),
+                ),
+                # "/Users/tonmoy/Desktop/" + "_headpose_%s.jpg" % (idx),
                 head_pose_image,
             )
 
@@ -149,11 +149,11 @@ def estimate_gaze(base_name, color_img, dist_coefficients, camera_matrix):
         if args.save_gaze:
             # add subject_id to cope with multiple persons in one image
             cv2.imwrite(
-                # os.path.join(
-                #     args.output_path,
-                #     os.path.splitext(base_name)[0] + "_gaze_%s.jpg" % (subject_id),
-                # ),
-                "/Users/tonmoy/Desktop/" + "_gaze_%s.jpg" % (subject_id),
+                os.path.join(
+                    args.output_path,
+                    os.path.splitext(base_name)[0] + "_gaze_%s.jpg" % (subject_id),
+                ),
+                # "/Users/tonmoy/Desktop/" + "_gaze_%s.jpg" % (subject_id),
                 s_gaze_img,
             )
             # cv2.imwrite(os.path.join(args.output_path, os.path.splitext(base_name)[0] + '_left.jpg'), subject.left_eye_color)
@@ -297,15 +297,20 @@ if __name__ == "__main__":
     parser.set_defaults(save_headpose=True)
     parser.set_defaults(save_estimate=True)
 
-    args = parser.parse_args()
+    parser.set_defaults(
+        im_path="/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/data"
+    )
+    parser.set_defaults(
+        output_path="/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/data/out"
+    )
 
-    image_path_list = [
-        "/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/data/em1.jpg"
-    ]
-    # if os.path.isfile(args.im_path):
-    if os.path.isfile(
-        "/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/data/em1.jpg"
-    ):
+    args = parser.parse_args()
+    print(args.im_path)
+
+    image_path_list = []
+    "/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/data/Photo1.jpg"
+
+    if os.path.isfile(args.im_path):
         image_path_list.append(os.path.split(args.im_path)[1])
         args.im_path = os.path.split(args.im_path)[0]
     elif os.path.isdir(args.im_path):
