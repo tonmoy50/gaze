@@ -9,6 +9,7 @@ import os
 import sys
 
 import cv2
+from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
@@ -98,25 +99,25 @@ def estimate_gaze(base_name, color_img, dist_coefficients, camera_matrix):
         face_image_resized = cv2.resize(
             subject.face_color, dsize=(224, 224), interpolation=cv2.INTER_CUBIC
         )
-        head_pose_image = landmark_estimator.visualize_headpose_result(
-            face_image_resized, (phi_head, theta_head)
-        )
+        # head_pose_image = landmark_estimator.visualize_headpose_result(
+        #     face_image_resized, (phi_head, theta_head)
+        # )
 
-        if args.vis_headpose:
-            plt.axis("off")
-            plt.imshow(cv2.cvtColor(head_pose_image, cv2.COLOR_BGR2RGB))
-            plt.show()
+        # if args.vis_headpose:
+        #     plt.axis("off")
+        #     plt.imshow(cv2.cvtColor(head_pose_image, cv2.COLOR_BGR2RGB))
+        #     plt.show()
 
-        if args.save_headpose:
-            # add idx to cope with multiple persons in one image
-            cv2.imwrite(
-                os.path.join(
-                    args.output_path,
-                    os.path.splitext(base_name)[0] + "_headpose_%s.jpg" % (idx),
-                ),
-                # "/Users/tonmoy/Desktop/" + "_headpose_%s.jpg" % (idx),
-                head_pose_image,
-            )
+        # if args.save_headpose:
+        #     # add idx to cope with multiple persons in one image
+        #     cv2.imwrite(
+        #         os.path.join(
+        #             args.output_path,
+        #             os.path.splitext(base_name)[0] + "_headpose_%s.jpg" % (idx),
+        #         ),
+        #         # "/Users/tonmoy/Desktop/" + "_headpose_%s.jpg" % (idx),
+        #         head_pose_image,
+        #     )
 
         input_r_list.append(gaze_estimator.input_from_image(subject.right_eye_color))
         input_l_list.append(gaze_estimator.input_from_image(subject.left_eye_color))
@@ -141,10 +142,12 @@ def estimate_gaze(base_name, color_img, dist_coefficients, camera_matrix):
         l_gaze_img = gaze_estimator.visualize_eye_result(subject.left_eye_color, gaze)
         s_gaze_img = np.concatenate((r_gaze_img, l_gaze_img), axis=1)
 
-        # if args.vis_gaze:
-        #     plt.axis("off")
-        #     plt.imshow(cv2.cvtColor(s_gaze_img, cv2.COLOR_BGR2RGB))
-        #     plt.show()
+        cv2.imshow("Gaze", s_gaze_img)
+
+        if args.vis_gaze:
+            plt.axis("off")
+            plt.imshow(cv2.cvtColor(s_gaze_img, cv2.COLOR_BGR2RGB))
+            plt.show()
 
         if args.save_gaze:
             # add subject_id to cope with multiple persons in one image
@@ -183,6 +186,8 @@ def estimate_gaze(base_name, color_img, dist_coefficients, camera_matrix):
                     + "]"
                     + "\n"
                 )
+
+        return s_gaze_img
 
 
 if __name__ == "__main__":
@@ -291,17 +296,20 @@ if __name__ == "__main__":
         help='Pytorch device id. Set to "cpu:0" to disable cuda',
     )
 
-    parser.set_defaults(vis_gaze=True)
-    parser.set_defaults(save_gaze=True)
+    parser.set_defaults(vis_gaze=False)
+    parser.set_defaults(save_gaze=False)
     parser.set_defaults(vis_headpose=False)
-    parser.set_defaults(save_headpose=True)
-    parser.set_defaults(save_estimate=True)
+    parser.set_defaults(save_headpose=False)
+    parser.set_defaults(save_estimate=False)
 
     parser.set_defaults(
         im_path="/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/data"
     )
     parser.set_defaults(
         output_path="/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/data/out"
+    )
+    parser.set_defaults(
+        calib_file="/Users/tonmoy/Desktop/Research/Education Project/Gaze/src/rt_gene/rt_gene/webcam_configs/webcam_blue_26010230.yaml"
     )
 
     args = parser.parse_args()
@@ -389,28 +397,52 @@ if __name__ == "__main__":
     if not os.path.isdir(args.output_path):
         os.makedirs(args.output_path)
 
-    for image_file_name in tqdm(image_path_list):
-        tqdm.write("Estimate gaze on " + image_file_name)
-        image = cv2.imread(os.path.join(args.im_path, image_file_name))
-        if image is None:
-            tqdm.write("Could not load " + image_file_name + ", skipping this image.")
-            continue
+    # for image_file_name in tqdm(image_path_list):
+    #     tqdm.write("Estimate gaze on " + image_file_name)
+    #     image = cv2.imread(os.path.join(args.im_path, image_file_name))
+    #     if image is None:
+    #         tqdm.write("Could not load " + image_file_name + ", skipping this image.")
+    #         continue
 
-        if args.calib_file is not None:
-            _dist_coefficients, _camera_matrix = load_camera_calibration(
-                args.calib_file
-            )
-        else:
-            im_width, im_height = image.shape[1], image.shape[0]
-            tqdm.write(
-                "WARNING!!! You should provide the camera calibration file, otherwise you might get bad results. Using a crude approximation!"
-            )
-            _dist_coefficients, _camera_matrix = np.zeros((1, 5)), np.array(
-                [
-                    [im_height, 0.0, im_width / 2.0],
-                    [0.0, im_height, im_height / 2.0],
-                    [0.0, 0.0, 1.0],
-                ]
-            )
+    #     if args.calib_file is not None:
+    #         _dist_coefficients, _camera_matrix = load_camera_calibration(
+    #             args.calib_file
+    #         )
+    #     else:
+    #         im_width, im_height = image.shape[1], image.shape[0]
+    #         tqdm.write(
+    #             "WARNING!!! You should provide the camera calibration file, otherwise you might get bad results. Using a crude approximation!"
+    #         )
+    #         _dist_coefficients, _camera_matrix = np.zeros((1, 5)), np.array(
+    #             [
+    #                 [im_height, 0.0, im_width / 2.0],
+    #                 [0.0, im_height, im_height / 2.0],
+    #                 [0.0, 0.0, 1.0],
+    #             ]
+    #         )
 
-        estimate_gaze(image_file_name, image, _dist_coefficients, _camera_matrix)
+    #     estimate_gaze(image_file_name, image, _dist_coefficients, _camera_matrix)
+
+    _dist_coefficients, _camera_matrix = load_camera_calibration(args.calib_file)
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("Error: Could not open webcam.")
+        exit()
+
+    while True:
+        ret, frame = cap.read()  # Read a frame from the webcam
+
+        if not ret:
+            print("Error: Can't receive frame (stream end?). Exiting ...")
+            break
+
+        estimate_gaze("", frame, _dist_coefficients, _camera_matrix)
+
+        # Press 'q' to exit the webcam display
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+
+    # Release the VideoCapture object and close windows
+    cap.release()
+    cv2.destroyAllWindows()
