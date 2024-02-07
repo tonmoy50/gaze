@@ -48,6 +48,7 @@ def extract_eye_image_patches(subjects):
 
 def estimate_gaze(base_name, color_img, dist_coefficients, camera_matrix):
     faceboxes = landmark_estimator.get_face_bb(color_img)
+    print(faceboxes)
     if len(faceboxes) == 0:
         tqdm.write("Could not find faces in the image")
         return
