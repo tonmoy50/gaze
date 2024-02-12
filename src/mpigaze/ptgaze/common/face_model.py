@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .camera import Camera
-from .face import Face
+from common.camera import Camera
+from common.face import Face
 
 
 @dataclasses.dataclass(frozen=True)
@@ -26,16 +26,18 @@ class FaceModel:
         # The default values of rvec and tvec below mean that the
         # initial estimate of the head pose is not rotated and the
         # face is in front of the camera.
-        rvec = np.zeros(3, dtype=np.float)
-        tvec = np.array([0, 0, 1], dtype=np.float)
-        _, rvec, tvec = cv2.solvePnP(self.LANDMARKS,
-                                     face.landmarks,
-                                     camera.camera_matrix,
-                                     camera.dist_coefficients,
-                                     rvec,
-                                     tvec,
-                                     useExtrinsicGuess=True,
-                                     flags=cv2.SOLVEPNP_ITERATIVE)
+        rvec = np.zeros(3, dtype=float)
+        tvec = np.array([0, 0, 1], dtype=float)
+        _, rvec, tvec = cv2.solvePnP(
+            self.LANDMARKS,
+            face.landmarks,
+            camera.camera_matrix,
+            camera.dist_coefficients,
+            rvec,
+            tvec,
+            useExtrinsicGuess=True,
+            flags=cv2.SOLVEPNP_ITERATIVE,
+        )
         rot = Rotation.from_rotvec(rvec)
         face.head_pose_rot = rot
         face.head_position = tvec
@@ -57,13 +59,17 @@ class FaceModel:
         eyes and the nose. The eye centers are defined as the average
         coordinates of the corners of each eye.
         """
-        if mode == 'ETH-XGaze':
-            face.center = face.model3d[np.concatenate(
-                [self.REYE_INDICES, self.LEYE_INDICES,
-                 self.NOSE_INDICES])].mean(axis=0)
+        if mode == "ETH-XGaze":
+            face.center = face.model3d[
+                np.concatenate(
+                    [self.REYE_INDICES, self.LEYE_INDICES, self.NOSE_INDICES]
+                )
+            ].mean(axis=0)
         else:
-            face.center = face.model3d[np.concatenate(
-                [self.REYE_INDICES, self.LEYE_INDICES,
-                 self.MOUTH_INDICES])].mean(axis=0)
+            face.center = face.model3d[
+                np.concatenate(
+                    [self.REYE_INDICES, self.LEYE_INDICES, self.MOUTH_INDICES]
+                )
+            ].mean(axis=0)
         face.reye.center = face.model3d[self.REYE_INDICES].mean(axis=0)
         face.leye.center = face.model3d[self.LEYE_INDICES].mean(axis=0)

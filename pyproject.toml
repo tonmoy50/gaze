@@ -19,7 +19,12 @@ torchaudio = "^2.1.2"
 scipy = "^1.11.4"
 pyyaml = "^6.0.1"
 pillow = "^10.2.0"
-ptgaze = "^0.2.8"
+dlib = "^19.24.2"
+face-alignment = "^1.4.1"
+mediapipe = "^0.10.9"
+numpy = "^1.26.4"
+omegaconf = "^2.3.0"
+timm = "^0.9.12"
 
 
 [build-system]
