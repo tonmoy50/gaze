@@ -14,7 +14,9 @@ class GazeEstimatorBase(object):
     It retrieves two image streams, one containing the left eye and another containing the right eye.
     It synchronizes these two images with the estimated head pose.
     The images are then converted in a suitable format, and a forward pass of the deep neural network
-    results in the estimated gaze for this frame. The estimated gaze is then published in the (theta, phi) notation."""
+    results in the estimated gaze for this frame. The estimated gaze is then published in the (theta, phi) notation.
+    """
+
     def __init__(self, device_id_gaze, model_files):
         if "OMP_NUM_THREADS" not in os.environ:
             os.environ["OMP_NUM_THREADS"] = "8"
@@ -30,7 +32,12 @@ class GazeEstimatorBase(object):
         else:
             self._gaze_offset = 0.0
 
-    def estimate_gaze_twoeyes(self, inference_input_left_list, inference_input_right_list, inference_headpose_list):
+    def estimate_gaze_twoeyes(
+        self,
+        inference_input_left_list,
+        inference_input_right_list,
+        inference_headpose_list,
+    ):
         pass
 
     def input_from_image(self, cv_image):
@@ -44,7 +51,14 @@ class GazeEstimatorBase(object):
         center_x = output_image.shape[1] / 2
         center_y = output_image.shape[0] / 2
 
-        endpoint_x, endpoint_y = get_endpoint(est_gaze[0], est_gaze[1], center_x, center_y, 50)
+        endpoint_x, endpoint_y = get_endpoint(
+            est_gaze[0], est_gaze[1], center_x, center_y, 50
+        )
 
-        cv2.line(output_image, (int(center_x), int(center_y)), (int(endpoint_x), int(endpoint_y)), (255, 0, 0))
+        cv2.line(
+            output_image,
+            (int(center_x), int(center_y)),
+            (int(endpoint_x), int(endpoint_y)),
+            (255, 0, 0),
+        )
         return output_image

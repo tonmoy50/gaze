@@ -19,6 +19,7 @@ torchaudio = "^2.1.2"
 scipy = "^1.11.4"
 pyyaml = "^6.0.1"
 pillow = "^10.2.0"
+ptgaze = "^0.2.8"
 
 
 [build-system]
