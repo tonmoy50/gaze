@@ -128,7 +128,8 @@ def load_mode_config(args: argparse.Namespace) -> DictConfig:
 
 def main():
     args = parse_args()
-    args.mode = "eth-xgaze"
+    # args.mode = "eth-xgaze"
+    args.mode = "mpiigaze"
     if args.debug:
         logging.getLogger("ptgaze").setLevel(logging.DEBUG)
 
