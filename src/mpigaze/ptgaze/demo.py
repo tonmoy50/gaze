@@ -90,8 +90,8 @@ class Demo:
         faces = self.gaze_estimator.detect_faces(undistorted)
         for face in faces:
             self.gaze_estimator.estimate_gaze(undistorted, face)
-            self._draw_face_bbox(face)
-            self._draw_head_pose(face)
+            # self._draw_face_bbox(face)
+            # self._draw_head_pose(face)
             self._draw_landmarks(face)
             self._draw_face_template_model(face)
             self._draw_gaze_vector(face)
