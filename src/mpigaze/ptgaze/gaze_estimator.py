@@ -88,8 +88,9 @@ class GazeEstimator:
         images = images.to(device)
         head_poses = head_poses.to(device)
         predictions = self._gaze_estimation_model(images, head_poses)
-        predictions = predictions.cpu().numpy()
         print(predictions)
+        predictions = predictions.cpu().numpy()
+
 
         for i, key in enumerate(self.EYE_KEYS):
             eye = getattr(face, key.name.lower())

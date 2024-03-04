@@ -25,6 +25,9 @@ mediapipe = "^0.10.9"
 numpy = "^1.26.4"
 omegaconf = "^2.3.0"
 timm = "^0.9.12"
+pyqt5 = "^5.15.10"
+ipykernel = "^6.29.3"
+nb-helpers = "^0.6.2"
 
 
 [build-system]
