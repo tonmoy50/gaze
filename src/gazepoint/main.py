@@ -6,6 +6,7 @@ import requests
 import zipfile
 import io
 import sys
+import traceback
 
 # import matlab.engine
 from tqdm import tqdm
@@ -333,7 +334,7 @@ def main(*args):
             test(net, test_data_loader, logging=logger)
             lr_scheduler.step()
         except Exception as e:
-            logger.error(f"""Error: {e}""")
+            logger.error(f"""Error: {traceback.print_exc()}""")
             exit(1)
 
 
