@@ -90,7 +90,7 @@ def test(net, test_data_loader, logging):
 
         total_loss.append([heatmap_loss.item(), m_angle_loss.item(), loss.item()])
         logging.info(
-            "loss: %.5lf, %.5lf, %.5lf"
+            "loss: %s, %s, %s"
             % ([heatmap_loss.item(), m_angle_loss.item(), loss.item()])
         )
 
@@ -243,20 +243,6 @@ def main(*args):
     logger.info(f"""Optimizer: {optimizer_s3}""")
 
     epochs = 25
-
-    # epoch = 0
-    # while epoch < max_epoch:
-    #     if epoch == 0:
-    #         lr_scheduler = lr_scheduler_s1
-    #         optimizer = optimizer_s1
-    #     elif epoch == 7:
-    #         lr_scheduler = lr_scheduler_s2
-    #         optimizer = optimizer_s2
-    #     elif epoch == 15:
-    #         lr_scheduler = lr_scheduler_s3
-    #         optimizer = optimizer_s3
-
-    #     lr_scheduler.step()
 
     for epoch in range(epochs):
         print(f"""Epoch: {epoch}""")
