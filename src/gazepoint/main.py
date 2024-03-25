@@ -186,7 +186,7 @@ def main(*args):
     )
 
     train_data_loader = DataLoader(
-        train_set, batch_size=32 * 4, shuffle=True, num_workers=16
+        train_set, batch_size=32 * 4, shuffle=True, num_workers=12
     )
     test_data_loader = DataLoader(
         test_set, batch_size=32 * 4, shuffle=False, num_workers=8
