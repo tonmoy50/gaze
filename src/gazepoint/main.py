@@ -258,7 +258,7 @@ def main(*args):
     #     lr_scheduler.step()
 
     for epoch in range(epochs):
-        print(f"""Epoch: {i}""")
+        print(f"""Epoch: {epoch}""")
         if epoch == 0:
             lr_scheduler = lr_scheduler_s1
             optimizer = optimizer_s1
