@@ -310,7 +310,7 @@ def main(*args):
                     loss = m_angle_loss + heatmap_loss
 
                 logger.info(
-                    f"""Epoch:{str(epoch)}, Heatmap Loss:{str(heatmap_loss.item())}, Angle Loss:{str(m_angle_loss.item())}, Total Loss:{str(loss.item())}"""
+                    f"""Dataindex:{str(i)}, Heatmap Loss:{str(heatmap_loss.item())}, Angle Loss:{str(m_angle_loss.item())}, Total Loss:{str(loss.item())}"""
                 )
 
                 loss.backward()
@@ -321,9 +321,9 @@ def main(*args):
                 )
                 if i % 10 == 9:
                     logger.info(
-                        "%s %s %s %s"
+                        "Dataindex:%s Average Loss:%s Mode:%s LR:%s"
                         % (
-                            str(epoch),
+                            str(i),
                             str(np.mean(running_loss, axis=0)),
                             "adam",
                             str(lr_scheduler.get_lr()),
