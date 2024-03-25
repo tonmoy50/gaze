@@ -88,7 +88,7 @@ def test(net, test_data_loader, logging):
 
         loss = heatmap_loss + m_angle_loss
 
-        total_loss.append([heatmap_loss.data[0], m_angle_loss.data[0], loss.data[0]])
+        total_loss.append([heatmap_loss.item(), m_angle_loss.item(), loss.item()])
         logging.info(
             "loss: %.5lf, %.5lf, %.5lf"
             % (heatmap_loss.data[0], m_angle_loss.data[0], loss.data[0])
@@ -132,7 +132,8 @@ def test(net, test_data_loader, logging):
 
             total_error.append([f_dist, m_angle, f_angle])
             info_list.append(list(f_point))
-    info_list = np.array(info_list)
+
+    # info_list = np.array(info_list)
     # np.savez('multi_scale_concat_prediction.npz', info_list=info_list)
 
     # heatmaps = np.stack(heatmaps)
@@ -281,10 +282,6 @@ def main(*args):
                     data["gt_position"],
                     data["gt_heatmap"],
                 )
-                # image, face_image, gaze_field, eye_position, gt_position, gt_heatmap = map(
-                #     lambda x: Variable(x.cuda()),
-                #     [image, face_image, gaze_field, eye_position, gt_position, gt_heatmap],
-                # )
                 image = image.to(device)
                 face_image = face_image.to(device)
                 gaze_field = gaze_field.to(device)
@@ -310,7 +307,13 @@ def main(*args):
                     loss = m_angle_loss + heatmap_loss
 
                 logger.info(
-                    f"""Dataindex:{str(i)}, Heatmap Loss:{str(heatmap_loss.item())}, Angle Loss:{str(m_angle_loss.item())}, Total Loss:{str(loss.item())}"""
+                    "Dataindex:%s, Heatmap Loss:%s, Angle Loss:%s, Total Loss:%s"
+                    % (
+                        str(i),
+                        str(heatmap_loss.item()),
+                        str(m_angle_loss.item()),
+                        str(loss.item()),
+                    )
                 )
 
                 loss.backward()
@@ -326,7 +329,7 @@ def main(*args):
                             str(i),
                             str(np.mean(running_loss, axis=0)),
                             "adam",
-                            str(lr_scheduler.get_lr()),
+                            str(lr_scheduler.get_last_lr()),
                         )
                     )
                     running_loss = []
