@@ -241,7 +241,7 @@ def main(*args):
     logger.info(f"""Optimizer: {optimizer_s2}""")
     logger.info(f"""Optimizer: {optimizer_s3}""")
 
-    epoch = 25
+    epochs = 25
 
     # epoch = 0
     # while epoch < max_epoch:
@@ -257,15 +257,15 @@ def main(*args):
 
     #     lr_scheduler.step()
 
-    for i in range(epoch):
+    for epoch in range(epochs):
         print(f"""Epoch: {i}""")
-        if i == 0:
+        if epoch == 0:
             lr_scheduler = lr_scheduler_s1
             optimizer = optimizer_s1
-        elif i == 7:
+        elif epoch == 7:
             lr_scheduler = lr_scheduler_s2
             optimizer = optimizer_s2
-        elif i == 15:
+        elif epoch == 15:
             lr_scheduler = lr_scheduler_s3
             optimizer = optimizer_s3
 
@@ -310,7 +310,7 @@ def main(*args):
                     loss = m_angle_loss + heatmap_loss
 
                 logger.info(
-                    f"""Epoch:{str(i)}, Heatmap Loss:{str(heatmap_loss.item())}, Angle Loss:{str(m_angle_loss.item())}, Total Loss:{str(loss.item())}"""
+                    f"""Epoch:{str(epoch)}, Heatmap Loss:{str(heatmap_loss.item())}, Angle Loss:{str(m_angle_loss.item())}, Total Loss:{str(loss.item())}"""
                 )
 
                 loss.backward()
@@ -323,7 +323,7 @@ def main(*args):
                     logger.info(
                         "%s %s %s %s"
                         % (
-                            str(i),
+                            str(epoch),
                             str(np.mean(running_loss, axis=0)),
                             "adam",
                             str(lr_scheduler.get_lr()),
