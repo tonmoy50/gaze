@@ -29,9 +29,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def download_and_extract_zip(url, extract_to, logger):
     if not os.path.exists(extract_to):
+        logger.info(f"Downloading {url}")
         response = requests.get(url)
         if response.status_code == 200:
             zip_file = zipfile.ZipFile(io.BytesIO(response.content))
+            logger.info(f"Extracting contents to {extract_to}")
             zip_file.extractall(extract_to)
             logger.info(f"Contents extracted to {extract_to}")
         else:
