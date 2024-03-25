@@ -1,5 +1,9 @@
 import torch
 from torch import nn
+import math
+
+import resnet as M
+import resnet_fpn as resnet_fpn
 
 
 class Bottleneck(nn.Module):
@@ -234,7 +238,8 @@ class FPN(nn.Module):
 
         # bottom up
         # self.resnet = resnet_fpn.resnet50(pretrained=True)
-        self.resnet = ResNet()
+        # self.resnet = ResNet()
+        self.resnet = resnet_fpn.resnet50(pretrained=True)
 
         # top down
         self.upsample = nn.Upsample(scale_factor=2, mode="nearest")
@@ -282,7 +287,8 @@ class GazeNet(nn.Module):
     def __init__(self):
         super(GazeNet, self).__init__()
         # self.face_net = M.resnet50(pretrained=True)
-        self.face_net = ResNet()
+        # self.face_net = ResNet()
+        self.face_net = M.resnet50(pretrained=True)
         self.face_process = nn.Sequential(nn.Linear(2048, 512), nn.ReLU(inplace=True))
 
         self.fpn_net = FPN()

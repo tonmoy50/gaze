@@ -2,6 +2,9 @@ from scipy.io import loadmat
 
 from datetime import datetime
 import os
+import requests
+import zipfile
+import io
 import sys
 import matlab.engine
 from tqdm import tqdm
@@ -21,6 +24,17 @@ mse_distance = torch.nn.MSELoss()
 bce_loss = torch.nn.BCELoss()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def download_and_extract_zip(url, extract_to, logger):
+    if not os.path.exists(extract_to):
+        response = requests.get(url)
+        if response.status_code == 200:
+            zip_file = zipfile.ZipFile(io.BytesIO(response.content))
+            zip_file.extractall(extract_to)
+            logger.info(f"Contents extracted to {extract_to}")
+        else:
+            logger.info("Failed to download the file.")
 
 
 def F_loss(direction, predict_heatmap, eye_position, gt_position, gt_heatmap):
@@ -150,6 +164,10 @@ def main(*args):
     logger.info(f"""Train annotations: {train_annotations}""")
     logger.info(f"""Test annotations: {test_annotations}""")
 
+    download_and_extract_zip(
+        "http://gazefollow.csail.mit.edu/downloads/data.zip", dataset_root, logger
+    )
+
     train_set = GazeDataset(
         logging=logger,
         root_dir=dataset_root,
@@ -248,68 +266,73 @@ def main(*args):
             optimizer = optimizer_s3
 
         # lr_scheduler.step()
-
-        running_loss = []
-        for i, data in tqdm(enumerate(train_data_loader)):
-            image, face_image, gaze_field, eye_position, gt_position, gt_heatmap = (
-                data["image"],
-                data["face_image"],
-                data["gaze_field"],
-                data["eye_position"],
-                data["gt_position"],
-                data["gt_heatmap"],
-            )
-            # image, face_image, gaze_field, eye_position, gt_position, gt_heatmap = map(
-            #     lambda x: Variable(x.cuda()),
-            #     [image, face_image, gaze_field, eye_position, gt_position, gt_heatmap],
-            # )
-            image = image.to(device)
-            face_image = face_image.to(device)
-            gaze_field = gaze_field.to(device)
-            eye_position = eye_position.to(device)
-            gt_position = gt_position.to(device)
-            gt_heatmap = gt_heatmap.to(device)
-
-            optimizer.zero_grad()
-
-            direction, predict_heatmap = net(
-                [image, face_image, gaze_field, eye_position]
-            )
-
-            heatmap_loss, m_angle_loss = F_loss(
-                direction, predict_heatmap, eye_position, gt_position, gt_heatmap
-            )
-
-            if epoch == 0:
-                loss = m_angle_loss
-            elif epoch >= 7 and epoch <= 14:
-                loss = heatmap_loss
-            else:
-                loss = m_angle_loss + heatmap_loss
-
-            loss.backward()
-            optimizer.step()
-
-            running_loss.append(
-                [heatmap_loss.data[0], m_angle_loss.data[0], loss.data[0]]
-            )
-            if i % 10 == 9:
-                logger.info(
-                    "%s %s %s"
-                    % (
-                        str(np.mean(running_loss, axis=0)),
-                        "adam",
-                        str(lr_scheduler.get_lr()),
-                    )
+        try:
+            running_loss = []
+            for i, data in tqdm(enumerate(train_data_loader)):
+                image, face_image, gaze_field, eye_position, gt_position, gt_heatmap = (
+                    data["image"],
+                    data["face_image"],
+                    data["gaze_field"],
+                    data["eye_position"],
+                    data["gt_position"],
+                    data["gt_heatmap"],
                 )
-                running_loss = []
+                # image, face_image, gaze_field, eye_position, gt_position, gt_heatmap = map(
+                #     lambda x: Variable(x.cuda()),
+                #     [image, face_image, gaze_field, eye_position, gt_position, gt_heatmap],
+                # )
+                image = image.to(device)
+                face_image = face_image.to(device)
+                gaze_field = gaze_field.to(device)
+                eye_position = eye_position.to(device)
+                gt_position = gt_position.to(device)
+                gt_heatmap = gt_heatmap.to(device)
 
-        test(net, test_data_loader, logging=logger)
-        lr_scheduler.step()
+                optimizer.zero_grad()
+
+                direction, predict_heatmap = net(
+                    [image, face_image, gaze_field, eye_position]
+                )
+
+                heatmap_loss, m_angle_loss = F_loss(
+                    direction, predict_heatmap, eye_position, gt_position, gt_heatmap
+                )
+
+                if epoch == 0:
+                    loss = m_angle_loss
+                elif epoch >= 7 and epoch <= 14:
+                    loss = heatmap_loss
+                else:
+                    loss = m_angle_loss + heatmap_loss
+
+                logger.info(
+                    f"""Epoch:{str(i)}, Heatmap Loss:{str(heatmap_loss)}, Angle Loss:{str(m_angle_loss)}, Total Loss:{str(loss)}"""
+                )
+
+                loss.backward()
+                optimizer.step()
+
+                running_loss.append(
+                    [heatmap_loss.item[0], m_angle_loss.item[0], loss.item[0]]
+                )
+                if i % 10 == 9:
+                    logger.info(
+                        "%s %s %s %s"
+                        % (
+                            str(i),
+                            str(np.mean(running_loss, axis=0)),
+                            "adam",
+                            str(lr_scheduler.get_lr()),
+                        )
+                    )
+                    running_loss = []
+
+            test(net, test_data_loader, logging=logger)
+            lr_scheduler.step()
+        except Exception as e:
+            logger.error(f"""Error: {e}""")
+            exit(1)
 
 
 if __name__ == "__main__":
-    dataset_root = os.path.join(
-        "/Users/tonmoy/Library/CloudStorage/OneDrive-IndianaUniversity/Research/Education Project/Data/GazeFollow Dataset"
-    )
     main()
