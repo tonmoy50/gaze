@@ -310,14 +310,14 @@ def main(*args):
                     loss = m_angle_loss + heatmap_loss
 
                 logger.info(
-                    f"""Epoch:{str(i)}, Heatmap Loss:{str(heatmap_loss)}, Angle Loss:{str(m_angle_loss)}, Total Loss:{str(loss)}"""
+                    f"""Epoch:{str(i)}, Heatmap Loss:{str(heatmap_loss.item())}, Angle Loss:{str(m_angle_loss.item())}, Total Loss:{str(loss.item())}"""
                 )
 
                 loss.backward()
                 optimizer.step()
 
                 running_loss.append(
-                    [heatmap_loss.item[0], m_angle_loss.item[0], loss.item[0]]
+                    [heatmap_loss.item(), m_angle_loss.item(), loss.item()]
                 )
                 if i % 10 == 9:
                     logger.info(
