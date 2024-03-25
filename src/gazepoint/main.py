@@ -154,8 +154,8 @@ def main(*args):
 
     if len(sys.argv) > 1:
         dataset_root = sys.argv[1]
-        train_annotations = sys.argv[2]
-        test_annotations = sys.argv[3]
+        train_annotations = os.path.join(dataset_root, sys.argv[2])
+        test_annotations = os.path.join(dataset_root, sys.argv[3])
     else:
         dataset_root = os.path.join(
             "/Users/tonmoy/Library/CloudStorage/OneDrive-IndianaUniversity/Research/Education Project/Data/GazeFollow Dataset"
