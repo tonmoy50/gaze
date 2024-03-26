@@ -90,7 +90,8 @@ def test(net, test_data_loader, logging):
 
         total_loss.append([heatmap_loss.item(), m_angle_loss.item(), loss.item()])
         logging.info(
-            "loss: %s, %s, %s" % (heatmap_loss.item(), m_angle_loss.item(), loss.item())
+            "Test loss: %s, %s, %s"
+            % (heatmap_loss.item(), m_angle_loss.item(), loss.item())
         )
 
         middle_output = direction.cpu().data.numpy()
@@ -157,12 +158,16 @@ def main(*args):
         dataset_root = sys.argv[1]
         train_annotations = os.path.join(dataset_root, sys.argv[2])
         test_annotations = os.path.join(dataset_root, sys.argv[3])
+        batch_size = sys.argv[4]
+        workers = sys.argv[5]
     else:
         dataset_root = os.path.join(
             "/Users/tonmoy/Library/CloudStorage/OneDrive-IndianaUniversity/Research/Education Project/Data/GazeFollow Dataset"
         )
         train_annotations = os.path.join(dataset_root, "train_annotations.mat")
         test_annotations = os.path.join(dataset_root, "test2_annotations.mat")
+        batch_size = 32
+        workers = 4
 
     logger.info(f"""Dataset root: {dataset_root}""")
     logger.info(f"""Train annotations: {train_annotations}""")
@@ -186,10 +191,10 @@ def main(*args):
     )
 
     train_data_loader = DataLoader(
-        train_set, batch_size=32 * 4, shuffle=True, num_workers=8
+        train_set, batch_size=batch_size, shuffle=True, num_workers=workers
     )
     test_data_loader = DataLoader(
-        test_set, batch_size=32 * 4, shuffle=False, num_workers=8
+        test_set, batch_size=batch_size, shuffle=False, num_workers=workers
     )
 
     logger.info(f"""Using Device: {device}""")
@@ -319,8 +324,13 @@ def main(*args):
                     )
                     running_loss = []
 
+                ### For CUDA out of memory error fix
+                if device == "cuda":
+                    torch.cuda.empty_cache()
+
             test(net, test_data_loader, logging=logger)
             lr_scheduler.step()
+
         except Exception as e:
             logger.error(f"""Error: {traceback.print_exc()}""")
             exit(1)

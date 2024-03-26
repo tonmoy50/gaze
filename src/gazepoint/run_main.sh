@@ -1,1 +1,1 @@
-python main.py /nobackup/nhaldert/Gazefollow train_annotations.mat test_annotations.mat
+python main.py /nobackup/nhaldert/Gazefollow train_annotations.mat test_annotations.mat 32 4
