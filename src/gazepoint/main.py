@@ -158,8 +158,8 @@ def main(*args):
         dataset_root = sys.argv[1]
         train_annotations = os.path.join(dataset_root, sys.argv[2])
         test_annotations = os.path.join(dataset_root, sys.argv[3])
-        batch_size = sys.argv[4]
-        workers = sys.argv[5]
+        batch_size = int(sys.argv[4])
+        workers = int(sys.argv[5])
     else:
         dataset_root = os.path.join(
             "/Users/tonmoy/Library/CloudStorage/OneDrive-IndianaUniversity/Research/Education Project/Data/GazeFollow Dataset"
