@@ -314,8 +314,9 @@ def main(*args):
                 )
                 if i % 10 == 9:
                     logger.info(
-                        "Dataindex:%s Average Loss:%s Mode:%s LR:%s"
+                        "Epoch:%s Dataindex:%s Average Loss:%s Mode:%s LR:%s"
                         % (
+                            str(epoch),
                             str(i),
                             str(np.mean(running_loss, axis=0)),
                             "adam",
