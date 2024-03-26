@@ -90,8 +90,7 @@ def test(net, test_data_loader, logging):
 
         total_loss.append([heatmap_loss.item(), m_angle_loss.item(), loss.item()])
         logging.info(
-            "loss: %s, %s, %s"
-            % ([heatmap_loss.item(), m_angle_loss.item(), loss.item()])
+            "loss: %s, %s, %s" % (heatmap_loss.item(), m_angle_loss.item(), loss.item())
         )
 
         middle_output = direction.cpu().data.numpy()
