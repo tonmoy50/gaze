@@ -297,9 +297,9 @@ def main(*args):
                     loss = m_angle_loss + heatmap_loss
 
                 logger.info(
-                    "Dataindex:%s, Heatmap Loss:%s, Angle Loss:%s, Total Loss:%s"
+                    "Epoch:%s Dataindex:%s, Heatmap Loss:%s, Angle Loss:%s, Total Loss:%s"
                     % (
-                        str(i),
+                        str(epoch).str(i),
                         str(heatmap_loss.item()),
                         str(m_angle_loss.item()),
                         str(loss.item()),
