@@ -14,7 +14,8 @@ import torchvision.transforms.functional as TF
 import matplotlib.pyplot as plt
 
 
-FILE_ROOT = os.path.dirname(os.path.abspath(__file__))
+# FILE_ROOT = os.path.dirname(os.path.abspath(__file__))
+FILE_ROOT = "/nfs/mareep/data/ssd1/nhaldert/datasets/GFIE_dataset"
 
 
 class GFIELoader(object):
@@ -52,16 +53,19 @@ class GFIELoader(object):
 
 class GFIEDataset(Dataset):
     def __init__(self, dstype) -> None:
+        self.input_size = 224
+
         self.rgb_image_path = os.path.join(FILE_ROOT, "rgb")
         if dstype == "train":
             df = pd.read_csv(os.path.join(FILE_ROOT, "train_annotation.txt"))
-        elif dstype == "val":
+        elif dstype == "valid":
             df = pd.read_csv(os.path.join(FILE_ROOT, "valid_annotation.txt"))
         elif dstype == "test":
             df = pd.read_csv(os.path.join(FILE_ROOT, "test_annotation.txt"))
         else:
             raise NotImplementedError
 
+        self.length=len(df)
         self.X_train = df[
             [
                 "scene_id",
@@ -80,6 +84,13 @@ class GFIEDataset(Dataset):
         self.Y_train = df[["gaze_u", "gaze_v", "gaze_X", "gaze_Y", "gaze_Z"]]
         self.length = len(df)
         self.dstype = dstype
+
+        transform_list = []
+        transform_list.append(transforms.Resize((self.input_size, self.input_size)))
+        transform_list.append(transforms.ToTensor())
+        # transform_list.append(transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
+
+        self.transform = transforms.Compose(transform_list)
 
     def __getitem__(self, index):
 
@@ -115,40 +126,44 @@ class GFIEDataset(Dataset):
         )
         gaze_vector = gaze_vector / norm_gaze_vector
         gaze_vector = torch.from_numpy(gaze_vector)
-
         gaze_target2d = torch.from_numpy(np.array([gaze_u, gaze_v]))
 
         data = dict()
         # Train
-        data["sceneimg"] = img
-        data["headimg"] = headimg
+        data["sceneimg"] = self.transform(img)
+        data["headimg"] = self.transform(headimg)
 
         # Label
-        data["gaze_vector"] = [gaze_vector]
+        data["gaze_vector"] = gaze_vector
         data["gaze_target2d"] = gaze_target2d
         return data
 
+    def __len__(self):
+        return self.length
 
-def collate_func():
-    batch = dict()
 
-    batch["sceneimg"] = []
-    batch["headimg"] = []
+def collate_func(batch):
+    batch_data = dict()
 
-    batch["gaze_vector"] = []
-    batch["gaze_target2d"] = []
+    batch_data["sceneimg"] = []
+    batch_data["headimg"] = []
+
+    batch_data["gaze_vector"] = []
+    batch_data["gaze_target2d"] = []
 
     for data in batch:
-        batch["sceneimg"].append(data["sceneimg"])
-        batch["headimg"].append(data["headimg"])
+        batch_data["sceneimg"].append(data["sceneimg"])
+        batch_data["headimg"].append(data["headimg"])
 
-        batch["gaze_vector"].append(data["gaze_vector"])
-        batch["gaze_target2d"].append(data["gaze_target2d"])
+        batch_data["gaze_vector"].append(data["gaze_vector"])
+        batch_data["gaze_target2d"].append(data["gaze_target2d"])
 
-    batch["sceneimg"] = torch.stack(batch["sceneimg"], 0)
-    batch["headimg"] = torch.stack(batch["headimg"], 0)
+    batch_data["sceneimg"] = torch.stack(batch_data["sceneimg"], 0)
+    batch_data["headimg"] = torch.stack(batch_data["headimg"], 0)
 
-    batch["gaze_vector"] = torch.stack(batch["gaze_vector"], 0)
-    batch["gaze_target2d"] = torch.stack(batch["gaze_target2d"], 0)
+    batch_data["gaze_vector"] = torch.stack(batch_data["gaze_vector"], 0)
+    batch_data["gaze_target2d"] = torch.stack(batch_data["gaze_target2d"], 0)
 
-    return batch
+    return batch_data
+
+
