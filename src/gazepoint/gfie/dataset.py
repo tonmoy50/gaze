@@ -28,7 +28,7 @@ class GFIELoader(object):
 
         self.train_loader = DataLoader(
             self.train_gaze,
-            batch_size=8,
+            batch_size=64,
             num_workers=4,
             shuffle=True,
             collate_fn=collate_func,
@@ -57,6 +57,8 @@ class GFIEDataset(Dataset):
         self.heatmap_output_size = 64
 
         self.rgb_image_path = os.path.join(FILE_ROOT, "rgb")
+        self.depth_path = os.path.join(FILE_ROOT, "depth")
+
         if dstype == "train":
             df = pd.read_csv(os.path.join(FILE_ROOT, "train_annotation.txt"))
         elif dstype == "valid":
@@ -116,7 +118,7 @@ class GFIEDataset(Dataset):
             "scene{}".format(int(scene_id)),
             "{:04}.jpg".format(int(frame_index)),
         )
-        depth_path=os.path.join(self.depth_path,self.dstype,"scene{}".format(scene_id),"{:04}.npy".format(frame_index))
+        depth_path=os.path.join(self.depth_path,self.dstype,"scene{}".format(int(scene_id)),"{:04}.npy".format(int(frame_index)))
 
         depthimg=np.load(depth_path)
         depthimg[np.isnan(depthimg)]=0
@@ -142,8 +144,7 @@ class GFIEDataset(Dataset):
         gaze_target2d = torch.from_numpy(np.array([gaze_u, gaze_v]))
 
         gaze_heatmap = torch.zeros(self.heatmap_output_size, self.heatmap_output_size)
-        gaze_heatmap = draw_labelmap(gaze_heatmap, [gaze_u * self.heatmap_output_size, gaze_v * self.heatmap_output_size],
-                                               3,type='Gaussian')
+        gaze_heatmap = draw_labelmap(gaze_heatmap, [gaze_u * self.heatmap_output_size, gaze_v * self.heatmap_output_size], 3, type='Gaussian')
 
         data = dict()
         # Train

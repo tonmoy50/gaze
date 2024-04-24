@@ -55,7 +55,7 @@ def euclid_dist(pred,target):
 
 def run():
 
-    device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(f'cuda' if torch.cuda.is_available() else 'cpu')
 
     epoch = 10
 
@@ -65,6 +65,7 @@ def run():
     test_loader = dataloader.test_loader
 
     net = MultiNet()
+    net = nn.DataParallel(net)
     net.to(device)
     print(net)
 

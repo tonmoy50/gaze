@@ -124,8 +124,10 @@ class GazeDirectionNet(nn.Module):
 
         self.fc = nn.Sequential(nn.Linear(2048, 256), nn.ReLU(), nn.Linear(256, 3))
 
-    def forward(self, himg, depthimg):
-        input_img = torch.cat((himg, depthimg), dim=0)
+    def forward(self, himg, depthimg, simg):
+        # input_img = torch.cat([himg, depthimg], dim=0)
+        # input_img = torch.cat((simg[::2], depthimg[1::2]), 2)
+        input_img = (simg + depthimg) / 2
         headfeat = self.backbone(input_img)
         headfeat = torch.flatten(headfeat, 1)
         gazevector = self.fc(headfeat)
@@ -142,7 +144,7 @@ class MultiNet(nn.Module):
         self.heatmap_net = HeatmapNet(pretrained=True)
 
     def forward(self, simg, himg, headloc, depthimg):
-        predicted_gazedirection = self.gaze_direction_net(himg, depthimg)
+        predicted_gazedirection = self.gaze_direction_net(himg, depthimg, simg)
         predicted_heatmap = self.heatmap_net(simg, predicted_gazedirection, headloc)
 
         return {"pred_gazedirection": predicted_gazedirection, "pred_heatmap": predicted_heatmap}
