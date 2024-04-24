@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from resnet import resnet50
 
+import numpy as np
+
 class Encoder(nn.Module):
     ''' Encoder in the Module for Generating GazeHeatmap '''
 
@@ -12,7 +14,7 @@ class Encoder(nn.Module):
 
         org_resnet=resnet50(pretrained)
 
-        self.conv1=nn.Conv2d(6,64,kernel_size=7,stride=2,padding=3,bias=False)
+        self.conv1=nn.Conv2d(4,64,kernel_size=7,stride=2,padding=3,bias=False)
         self.bn1=org_resnet.bn1
         self.relu=org_resnet.relu
         self.maxpool=org_resnet.maxpool
@@ -87,8 +89,23 @@ class HeatmapNet(nn.Module):
         self.encoder=Encoder(pretrained=pretrained)
         self.decoder=Decoder()
 
-    def forward(self,simg,SFoVheatmap,headloc):
-        input=torch.cat([simg,headloc]+SFoVheatmap,dim=1)
+    def forward(self,simg,gaze_direction,headloc):
+        # input=torch.cat([simg,headloc]+SFoVheatmap,dim=1)
+        # bs = gaze_direction.shape[0]
+        # h,w= simg.shape[2:]
+        # gaze_direction=gaze_direction.unsqueeze(2)
+
+        # # matrix_T=matrix_T.reshape([bs,-1,3])
+
+        # F=torch.matmul(headloc,gaze_direction)
+        # F=F.reshape([bs,1,h,w])
+        # print(F.shape)
+
+        gaze_direction_expanded = gaze_direction.repeat(1, 74)
+        final_tensor = torch.cat([gaze_direction_expanded, gaze_direction[:, :2]], dim=1)
+        # print(final_tensor.shape)
+
+        input=torch.cat([simg,headloc],dim=1)
 
         global_feat=self.encoder(input)
 
@@ -107,8 +124,9 @@ class GazeDirectionNet(nn.Module):
 
         self.fc = nn.Sequential(nn.Linear(2048, 256), nn.ReLU(), nn.Linear(256, 3))
 
-    def forward(self, himg):
-        headfeat = self.backbone(himg)
+    def forward(self, himg, depthimg):
+        input_img = torch.cat((himg, depthimg), dim=0)
+        headfeat = self.backbone(input_img)
         headfeat = torch.flatten(headfeat, 1)
         gazevector = self.fc(headfeat)
         gazevector = F.normalize(gazevector)
@@ -121,8 +139,10 @@ class MultiNet(nn.Module):
         super(MultiNet, self).__init__()
 
         self.gaze_direction_net = GazeDirectionNet()
+        self.heatmap_net = HeatmapNet(pretrained=True)
 
-    def forward(self, simg, himg):
-        predicted_gazedirection = self.gaze_direction_net(himg)
+    def forward(self, simg, himg, headloc, depthimg):
+        predicted_gazedirection = self.gaze_direction_net(himg, depthimg)
+        predicted_heatmap = self.heatmap_net(simg, predicted_gazedirection, headloc)
 
-        return {"pred_gazedirection": predicted_gazedirection}
+        return {"pred_gazedirection": predicted_gazedirection, "pred_heatmap": predicted_heatmap}
