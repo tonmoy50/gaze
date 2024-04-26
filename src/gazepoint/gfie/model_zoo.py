@@ -5,49 +5,54 @@ from resnet import resnet50
 
 import numpy as np
 
+
 class Encoder(nn.Module):
-    ''' Encoder in the Module for Generating GazeHeatmap '''
+    """Encoder in the Module for Generating GazeHeatmap"""
 
-    def __init__(self,pretrained=False):
+    def __init__(self, pretrained=False):
 
-        super(Encoder,self).__init__()
+        super(Encoder, self).__init__()
 
-        org_resnet=resnet50(pretrained)
+        org_resnet = resnet50(pretrained)
 
-        self.conv1=nn.Conv2d(4,64,kernel_size=7,stride=2,padding=3,bias=False)
-        self.bn1=org_resnet.bn1
-        self.relu=org_resnet.relu
-        self.maxpool=org_resnet.maxpool
-        self.layer1=org_resnet.layer1
-        self.layer2=org_resnet.layer2
-        self.layer3=org_resnet.layer3
-        self.layer4=org_resnet.layer4
+        self.conv1 = nn.Conv2d(4, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = org_resnet.bn1
+        self.relu = org_resnet.relu
+        self.maxpool = org_resnet.maxpool
+        self.layer1 = org_resnet.layer1
+        self.layer2 = org_resnet.layer2
+        self.layer3 = org_resnet.layer3
+        self.layer4 = org_resnet.layer4
 
-    def forward(self,x):
+    def forward(self, x):
 
-        x=self.conv1(x)
-        x=self.bn1(x)
-        x=self.relu(x)
-        x=self.maxpool(x)
-        x=self.layer1(x)
-        x=self.layer2(x)
-        x=self.layer3(x)
-        x=self.layer4(x)
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
 
         return x
 
-class Decoder(nn.Module):
-    ''' Decoder in the Module for Generating GazeHeatmap '''
 
+class Decoder(nn.Module):
+    """Decoder in the Module for Generating GazeHeatmap"""
 
     def __init__(self):
-        super(Decoder,self).__init__()
+        super(Decoder, self).__init__()
 
-        self.relu=nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=True)
 
-        self.compress_conv1 = nn.Conv2d(2048, 1024, kernel_size=1, stride=1, padding=0, bias=False)
+        self.compress_conv1 = nn.Conv2d(
+            2048, 1024, kernel_size=1, stride=1, padding=0, bias=False
+        )
         self.compress_bn1 = nn.BatchNorm2d(1024)
-        self.compress_conv2 = nn.Conv2d(1024, 512, kernel_size=1, stride=1, padding=0, bias=False)
+        self.compress_conv2 = nn.Conv2d(
+            1024, 512, kernel_size=1, stride=1, padding=0, bias=False
+        )
         self.compress_bn2 = nn.BatchNorm2d(512)
 
         self.deconv1 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2)
@@ -58,7 +63,7 @@ class Decoder(nn.Module):
         self.deconv_bn3 = nn.BatchNorm2d(1)
         self.conv4 = nn.Conv2d(1, 1, kernel_size=1, stride=1)
 
-    def forward(self,x):
+    def forward(self, x):
 
         x = self.compress_conv1(x)
         x = self.compress_bn1(x)
@@ -80,16 +85,17 @@ class Decoder(nn.Module):
 
         return x
 
+
 class HeatmapNet(nn.Module):
-    ''' The Module for Generating GazeHeatmap '''
+    """The Module for Generating GazeHeatmap"""
 
-    def __init__(self,pretrained=False):
-        super(HeatmapNet,self).__init__()
+    def __init__(self, pretrained=False):
+        super(HeatmapNet, self).__init__()
 
-        self.encoder=Encoder(pretrained=pretrained)
-        self.decoder=Decoder()
+        self.encoder = Encoder(pretrained=pretrained)
+        self.decoder = Decoder()
 
-    def forward(self,simg,gaze_direction,headloc):
+    def forward(self, simg, gaze_direction, headloc):
         # input=torch.cat([simg,headloc]+SFoVheatmap,dim=1)
         # bs = gaze_direction.shape[0]
         # h,w= simg.shape[2:]
@@ -102,16 +108,19 @@ class HeatmapNet(nn.Module):
         # print(F.shape)
 
         gaze_direction_expanded = gaze_direction.repeat(1, 74)
-        final_tensor = torch.cat([gaze_direction_expanded, gaze_direction[:, :2]], dim=1)
+        final_tensor = torch.cat(
+            [gaze_direction_expanded, gaze_direction[:, :2]], dim=1
+        )
         # print(final_tensor.shape)
 
-        input=torch.cat([simg,headloc],dim=1)
+        input = torch.cat([simg, headloc], dim=1)
 
-        global_feat=self.encoder(input)
+        global_feat = self.encoder(input)
 
-        gazeheatmap=self.decoder(global_feat)
+        gazeheatmap = self.decoder(global_feat)
 
         return gazeheatmap
+
 
 class GazeDirectionNet(nn.Module):
     def __init__(self):
@@ -147,4 +156,7 @@ class MultiNet(nn.Module):
         predicted_gazedirection = self.gaze_direction_net(himg, depthimg, simg)
         predicted_heatmap = self.heatmap_net(simg, predicted_gazedirection, headloc)
 
-        return {"pred_gazedirection": predicted_gazedirection, "pred_heatmap": predicted_heatmap}
+        return {
+            "pred_gazedirection": predicted_gazedirection,
+            "pred_heatmap": predicted_heatmap,
+        }
