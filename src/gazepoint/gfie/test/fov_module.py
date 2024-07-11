@@ -65,7 +65,7 @@ def get_fov(matrix_T, gazevector, simg_shape, alpha=3):
 
     F = torch.matmul(matrix_T, gazevector)
     # F = F.reshape([bs, 1, h, w])
-
+    print(F)
     F_alpha = relu(F)
     F_alpha = torch.pow(F_alpha, alpha)
 
@@ -105,9 +105,10 @@ def view_depthimg(img):
     grad = cv2.merge([grad, grad, grad])
 
     grad_img = Image.fromarray(stretch)
-    Image._show(grad_img)
+    # Image._show(grad_img)
     final_img = Image.fromarray(result)
-    Image._show(final_img)
+    # Image._show(final_img)
+    return grad_img, final_img
 
 
 def main():
@@ -125,7 +126,7 @@ def main():
     f, f_alpha = get_fov(matrix_T, torch.tensor([0.1, 0.2, 0.3]), (1, 1, 224, 224))
 
     # view_depthimg(f_alpha.numpy())
-    view_depthimg(depthimg)
+    # view_depthimg(depthimg)
 
 
 if __name__ == "__main__":

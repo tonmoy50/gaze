@@ -38,6 +38,10 @@ def draw_circle(img, center, radius):
 
 
 def draw_3d_point(img, point):
+    point[0] = point[0]
+    point[1] = point[1]
+    point[2] = point[2]
+
     camera_param = {
         "fx": 910.78759766,
         "fy": 910.21258545,
@@ -107,7 +111,7 @@ def draw_3d_point(img, point):
     return Image.fromarray(img)
 
 
-def work_on_rgb_image(img_path, annotations):
+def work_on_rgb_image():
     img_path = os.path.join(CUR_DIR, "0000.jpg")
     annotations = {
         "index": 1,
@@ -139,7 +143,7 @@ def work_on_rgb_image(img_path, annotations):
         annotations["gaze_Y"] - annotations["eye_Y"],
         annotations["gaze_Z"] - annotations["eye_Z"],
     )
-    print(gaze_vec)
+    # print(gaze_vec)
 
     img = Image.open(img_path)
     # Image._show(img)
@@ -163,14 +167,19 @@ def work_on_rgb_image(img_path, annotations):
         (int(annotations["eye_u"]), int(annotations["eye_v"])),
         10,
     )
+    # new_img = draw_3d_point(
+    #     new_img,
+    #     [
+    #         annotations["gaze_X"],
+    #         annotations["gaze_Y"],
+    #         annotations["gaze_Z"],
+    #     ],
+    # )
     new_img = draw_3d_point(
-        new_img, (annotations["gaze_X"], annotations["gaze_Y"], annotations["gaze_Z"])
-    )
-    new_img = draw_3d_point(
-        new_img, (annotations["eye_X"], annotations["eye_Y"], annotations["eye_Z"])
+        new_img, [annotations["eye_X"], annotations["eye_Y"], annotations["eye_Z"]]
     )
 
-    # Image._show(new_img)
+    Image._show(new_img)
 
 
 def work_on_depth_image():
@@ -185,8 +194,8 @@ def work_on_depth_image():
 
 def main():
 
-    # work_on_rgb_image()
-    work_on_depth_image()
+    work_on_rgb_image()
+    # work_on_depth_image()
 
 
 if __name__ == "__main__":
