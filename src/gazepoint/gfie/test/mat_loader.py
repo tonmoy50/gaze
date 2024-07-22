@@ -7,8 +7,10 @@ print(CUR_DIR)
 
 def main():
     mat = loadmat(os.path.join(CUR_DIR, "metadata.mat"))
-    # print(len(mat["gaze_dir"]))
-    print(mat["gaze_dir"])
+    print(mat.keys())
+    # print(mat["gaze_dir"])
+
+    
 
 
 if __name__ == "__main__":
