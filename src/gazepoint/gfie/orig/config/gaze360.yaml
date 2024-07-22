@@ -1,6 +1,6 @@
 DATASET:
 
-  root_dir: "/Users/tonmoy/Library/CloudStorage/OneDrive-IndianaUniversity/Research/Education Project/Data/gaze360"
+  root_dir: "/nfs/mareep/data/ssd1/nhaldert/datasets/Gaze360"
   rgb: "rgb"
   depth: "depth"
   camerapara: "CameraKinect.npy"
