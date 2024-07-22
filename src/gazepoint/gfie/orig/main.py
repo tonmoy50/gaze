@@ -23,7 +23,7 @@ from trainer import Trainer
 from tester import Tester
 from tensorboardX import SummaryWriter
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 def train_engine(opt):
