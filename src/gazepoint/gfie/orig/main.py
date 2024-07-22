@@ -32,6 +32,7 @@ def train_engine(opt):
     best_cosine_error = sys.maxsize
     # init gaze model
     gazemodel = init_model(opt)
+    gazemodel = torch.nn.DataParallel(gazemodel)
 
     # set criterion and optimizer for gaze model
     criterion, optimizer = setup_model(gazemodel, opt)

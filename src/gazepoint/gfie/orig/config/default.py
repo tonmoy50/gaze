@@ -24,10 +24,10 @@ _C.DATASET.test = ""
 
 
 # dataset loader
-_C.DATASET.load_workers = 8
-_C.DATASET.train_batch_size = 16
-_C.DATASET.valid_batch_size = 16
-_C.DATASET.test_batch_size = 16
+_C.DATASET.load_workers = 12
+_C.DATASET.train_batch_size = 64
+_C.DATASET.valid_batch_size = 64
+_C.DATASET.test_batch_size = 64
 
 
 # -----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ _C.OTHER = CN()
 
 _C.OTHER.seed = 235
 # if gpu is used
-_C.OTHER.device = "cpu"
+_C.OTHER.device = 0
 
 _C.OTHER.cpkt = ""
 
