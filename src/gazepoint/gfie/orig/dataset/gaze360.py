@@ -56,7 +56,7 @@ class Gaze360(Dataset):
         # rgb_path=os.path.join(opt.DATASET.root_dir,opt.DATASET.rgb)
         # depth_path=os.path.join(opt.DATASET.root_dir,opt.DATASET.depth)
 
-        # camerapara=np.load(os.path.join(opt.DATASET.root_dir,opt.DATASET.camerapara))
+        camerapara = np.load(os.path.join(opt.DATASET.root_dir, opt.DATASET.camerapara))
 
         if dstype == "train":
             annofile_path = os.path.join(opt.DATASET.root_dir, opt.DATASET.train)
@@ -90,7 +90,7 @@ class Gaze360(Dataset):
 
         # self.rgb_path=rgb_path
         # self.depth_path=depth_path
-        # self.camerapara=camerapara
+        self.camerapara = camerapara
 
         self.input_size = opt.TRAIN.input_size
         self.output_size = opt.TRAIN.output_size
@@ -108,9 +108,7 @@ class Gaze360(Dataset):
 
         self.imshow = show
 
-        self.depth_estimator = pipeline(
-            "depth-estimation", model="vinvino02/glpn-nyu", device=0
-        )
+        self.depth_estimator = pipeline("depth-estimation", model="vinvino02/glpn-nyu")
 
     def __getitem__(self, index):
 
@@ -148,13 +146,10 @@ class Gaze360(Dataset):
         # depthimg[np.isnan(depthimg)]=0
         # depthimg=depthimg.astype(np.float32)
         # depthimg=Image.fromarray(depthimg)
-        depthimg = depth_estimator(
+        depthimg = self.depth_estimator(
             Image.open(os.path.join(self.dataset_root, "imgs", simg))
         )["depth"]
-        depth_estimator = pipeline(
-            "depth-estimation", model="vinvino02/glpn-nyu", device=0
-        )
-        estimated_depth = depth_estimator(img)
+        estimated_depth = self.depth_estimator(img)
         depthimg = estimated_depth["depth"]
 
         # expand face bbox a bit
@@ -286,7 +281,9 @@ class Gaze360(Dataset):
         final_width, final_height = img.size
 
         # crop the face
-        headimg = img.crop((int(x_min), int(y_min), int(x_max), int(y_max)))
+        # headimg = img.crop((int(x_min), int(y_min), int(x_max), int(y_max)))
+        headimg = Image.open(os.path.join(self.dataset_root, "imgs", simg))
+        headimg = headimg.convert("RGB")
 
         # set for display
         if self.imshow:

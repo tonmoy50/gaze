@@ -72,54 +72,54 @@ def train_engine(opt):
     val_loader = dataloader.val_loader
     test_loader = dataloader.test_loader
 
-    print(next(iter(train_loader)))
+    # print(next(iter(train_loader)))
 
     # init trainer and validator for gazemodel
-    # trainer = Trainer(
-    #     gazemodel, criterion, optimizer, train_loader, val_loader, opt, writer=writer
-    # )
+    trainer = Trainer(
+        gazemodel, criterion, optimizer, train_loader, val_loader, opt, writer=writer
+    )
 
-    # tester = Tester(gazemodel, criterion, test_loader, opt, writer=writer)
+    tester = Tester(gazemodel, criterion, test_loader, opt, writer=writer)
 
-    # trainer.get_best_error(best_dist_error, best_cosine_error)
+    trainer.get_best_error(best_dist_error, best_cosine_error)
 
-    # optimizer.zero_grad()
+    optimizer.zero_grad()
 
-    # print("Total epoch:{}".format(opt.TRAIN.end_epoch))
+    print("Total epoch:{}".format(opt.TRAIN.end_epoch))
 
-    # for epoch in range(opt.TRAIN.start_epoch, opt.TRAIN.end_epoch):
+    for epoch in range(opt.TRAIN.start_epoch, opt.TRAIN.end_epoch):
 
-    #     print(
-    #         "Epoch number:{} | Learning rate:{}\n".format(
-    #             epoch, optimizer.param_groups[0]["lr"]
-    #         )
-    #     )
+        print(
+            "Epoch number:{} | Learning rate:{}\n".format(
+                epoch, optimizer.param_groups[0]["lr"]
+            )
+        )
 
-    #     trainer.train(epoch, opt)
+        trainer.train(epoch, opt)
 
-    #     # save the parameters of model
-    #     if epoch % opt.TRAIN.save_intervel == 0:
+        # save the parameters of model
+        if epoch % opt.TRAIN.save_intervel == 0:
 
-    #         valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
+            valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
 
-    #         save_checkpoint(gazemodel, optimizer, valid_error, False, epoch, opt)
+            save_checkpoint(gazemodel, optimizer, valid_error, False, epoch, opt)
 
-    #     # save the parameters of model with the best performance on valid dataset
-    #     if trainer.best_flag:
-    #         valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
+        # save the parameters of model with the best performance on valid dataset
+        if trainer.best_flag:
+            valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
 
-    #         save_checkpoint(
-    #             gazemodel, optimizer, valid_error, trainer.best_flag, epoch, opt
-    #         )
+            save_checkpoint(
+                gazemodel, optimizer, valid_error, trainer.best_flag, epoch, opt
+            )
 
-    #     time.sleep(0.03)
+        time.sleep(0.03)
 
-    #     dist_error, gaze_error = tester.test(epoch, opt)
-    #     print(
-    #         "current error| L2 dist: {:.2f}/Gaze cosine {:.2f}".format(
-    #             dist_error, gaze_error
-    #         )
-    #     )
+        dist_error, gaze_error = tester.test(epoch, opt)
+        print(
+            "current error| L2 dist: {:.2f}/Gaze cosine {:.2f}".format(
+                dist_error, gaze_error
+            )
+        )
 
 
 if __name__ == "__main__":
