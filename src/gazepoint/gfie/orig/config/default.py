@@ -24,10 +24,10 @@ _C.DATASET.test = ""
 
 
 # dataset loader
-_C.DATASET.load_workers = 12
-_C.DATASET.train_batch_size = 64
-_C.DATASET.valid_batch_size = 64
-_C.DATASET.test_batch_size = 64
+_C.DATASET.load_workers = 2
+_C.DATASET.train_batch_size = 16
+_C.DATASET.valid_batch_size = 16
+_C.DATASET.test_batch_size = 16
 
 
 # -----------------------------------------------------------------------------

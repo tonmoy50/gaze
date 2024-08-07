@@ -1,6 +1,6 @@
 DATASET:
 
-  root_dir: "/home/hzx/Dataset/GFIE_dataset"
+  root_dir: "/nfs/mareep/data/ssd1/nhaldert/datasets/GFIE_dataset"
   rgb: "rgb"
   depth: "depth"
   camerapara: "CameraKinect.npy"
@@ -13,7 +13,7 @@ DATASET:
   train_batch_size: 32
 
 MODEL:
-  backboneptpath: "/extend/hzx/Model_para/ptbackbone.pt"
+  backboneptpath: "./gfiemodels"
 
 TRAIN:
   lr: 1e-4
@@ -22,7 +22,7 @@ TRAIN:
   resume: False
   resume_add: ""
 
-  store: "/extend/hzx/Model_para/GFIEpub_model/"
+  store: "./gfiemodels/"
 
   save_intervel: 1
 

@@ -108,7 +108,9 @@ class Gaze360(Dataset):
 
         self.imshow = show
 
-        self.depth_estimator = pipeline("depth-estimation", model="vinvino02/glpn-nyu")
+        self.depth_estimator = pipeline(
+            "depth-estimation", model="vinvino02/glpn-nyu", device=opt.OTHER.device
+        )
 
     def __getitem__(self, index):
 
@@ -146,11 +148,19 @@ class Gaze360(Dataset):
         # depthimg[np.isnan(depthimg)]=0
         # depthimg=depthimg.astype(np.float32)
         # depthimg=Image.fromarray(depthimg)
-        depthimg = self.depth_estimator(
-            Image.open(os.path.join(self.dataset_root, "imgs", simg))
-        )["depth"]
-        estimated_depth = self.depth_estimator(img)
-        depthimg = estimated_depth["depth"]
+        # depthimg = self.depth_estimator(
+        #     Image.open(os.path.join(self.dataset_root, "imgs", simg))
+        # )["depth"]
+        deptharr = np.load(
+            os.path.join(self.dataset_root, "depths", simg.replace("jpg", "npy"))
+        )
+        depthimg = Image.fromarray(deptharr)
+        # depthimg[np.isnan(depthimg)]=0
+        # depthimg=depthimg.astype(np.float32)
+        # depthimg=Image.fromarray(depthimg)
+
+        # estimated_depth = self.depth_estimator(img)
+        # depthimg = estimated_depth["depth"]
 
         # expand face bbox a bit
         k = 0.1
@@ -248,16 +258,19 @@ class Gaze360(Dataset):
                 eye_u = 1 - eye_u
 
             # Random change the brightness, contrast and saturation of the scene images
-            if np.random.random_sample() <= 0.5:
-                img = TF.adjust_brightness(
-                    img, brightness_factor=np.random.uniform(0.5, 1.5)
-                )
-                img = TF.adjust_contrast(
-                    img, contrast_factor=np.random.uniform(0.5, 1.5)
-                )
-                img = TF.adjust_saturation(
-                    img, saturation_factor=np.random.uniform(0, 1.5)
-                )
+            try:
+                if np.random.random_sample() <= 0.5:
+                    img = TF.adjust_brightness(
+                        img, brightness_factor=np.random.uniform(0.5, 1.5)
+                    )
+                    img = TF.adjust_contrast(
+                        img, contrast_factor=np.random.uniform(0.5, 1.5)
+                    )
+                    img = TF.adjust_saturation(
+                        img, saturation_factor=np.random.uniform(0, 1.5)
+                    )
+            except Exception as e:
+                img = img
 
         else:
 
