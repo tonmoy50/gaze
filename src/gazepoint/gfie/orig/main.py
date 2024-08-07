@@ -131,7 +131,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--cfg",
-        default="config/gaze360.yaml",
+        # default="config/gaze360.yaml",
+        default="config/gfiebenchmark.yaml",
         metavar="FILE",
         help="path to config file",
         type=str,
