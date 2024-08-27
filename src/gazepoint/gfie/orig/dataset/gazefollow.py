@@ -375,8 +375,8 @@ class GazeFollow(Dataset):
         norm_gaze_vector = (
             1.0 if np.linalg.norm(gaze_vector) <= 0.0 else np.linalg.norm(gaze_vector)
         )
-        # gaze_vector = gaze_vector / norm_gaze_vector
-        # gaze_vector = torch.from_numpy(gaze_vector)
+        gaze_vector = gaze_vector / norm_gaze_vector
+        gaze_vector = torch.from_numpy(gaze_vector)
 
         # generate the heat map label
         gaze_heatmap = torch.zeros(
