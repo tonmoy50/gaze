@@ -144,7 +144,10 @@ class PSFoVModule(nn.Module):
 
         matrix_T = matrix_T.reshape([bs, -1, 3])
 
-        gazevector = np.hstack([gazevector, np.zeros((4, 1))])  # For Gazefollow dataset
+        gazevector = np.hstack(
+            [gazevector.cpu().numpy(), np.zeros((4, 1))]
+        )  # For Gazefollow dataset
+        gazevector = torch.from_numpy(gazevector).to(device="cuda:0")
 
         F = torch.matmul(matrix_T, gazevector)
         F = F.reshape([bs, 1, h, w])
