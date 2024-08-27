@@ -149,7 +149,7 @@ class PSFoVModule(nn.Module):
         #     [gazevector.detach().numpy(), np.zeros((4, 1))]
         # )  # For Gazefollow dataset
         # gazevector = torch.from_numpy(gazevector).to(device="cuda:0")
-        gazevector = torch.cat((gazevector, torch.zeros(4, 1, device="cuda")), dim=1)
+        # gazevector = torch.cat((gazevector, torch.zeros(4, 1, device="cuda")), dim=1)
 
         F = torch.matmul(matrix_T, gazevector)
         F = F.reshape([bs, 1, h, w])
