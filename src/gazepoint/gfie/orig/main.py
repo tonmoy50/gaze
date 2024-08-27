@@ -12,6 +12,7 @@ from datetime import datetime
 from config import cfg
 from dataset.gaze360 import Gaze360Loader
 from dataset.gfie import GFIELoader
+from dataset.gazefollow import GazeFollowLoader
 from utils.model_utils import (
     init_model,
     setup_model,
@@ -70,7 +71,7 @@ def train_engine(opt):
             raise Exception("No such checkpoint file")
 
     # dataloader = Gaze360Loader(opt)
-    dataloader = GFIELoader(opt)
+    dataloader = GazeFollowLoader(opt)
     train_loader = dataloader.train_loader
     val_loader = dataloader.val_loader
     test_loader = dataloader.test_loader
