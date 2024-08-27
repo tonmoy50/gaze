@@ -24,7 +24,7 @@ TRAIN:
 
   store: "./gfiemodels/"
 
-  save_intervel: 1
+  save_intervel: 5
 
   end_epoch: 20
 
