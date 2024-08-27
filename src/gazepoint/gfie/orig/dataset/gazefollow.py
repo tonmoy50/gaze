@@ -348,13 +348,9 @@ class GazeFollow(Dataset):
         matrix_T_Y = (matrix_T_yy * scale_height + offset_y - cy) * depthmap / fy
         matrix_T_Z = depthmap
 
-        # matrix_T = np.dstack((matrix_T_X, matrix_T_Y, matrix_T_Z))
-        # matrix_T = matrix_T.reshape([-1, 3])
-        # matrix_T = matrix_T.reshape([self.input_size, self.input_size, 3])
-
-        matrix_T = np.dstack((matrix_T_X, matrix_T_Y))
-        matrix_T = matrix_T.reshape([-1, 2])
-        matrix_T = matrix_T.reshape([self.input_size, self.input_size])
+        matrix_T = np.dstack((matrix_T_X, matrix_T_Y, matrix_T_Z))
+        matrix_T = matrix_T.reshape([-1, 3])
+        matrix_T = matrix_T.reshape([self.input_size, self.input_size, 3])
 
         # if flip_flag:
         #     matrix_T = matrix_T - np.array([-eye_X, eye_Y, eye_Z])
