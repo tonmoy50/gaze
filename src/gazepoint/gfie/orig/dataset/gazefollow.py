@@ -138,7 +138,10 @@ class GazeFollow(Dataset):
         # depth_path=os.path.join(self.depth_path,self.dstype,"scene{}".format(scene_id),"{:04}.npy".format(frame_index))
 
         # load the rgb image
-        img = Image.open(os.path.join(self.dataset_root, "imgs", simg))
+        # img = Image.open(os.path.join(self.dataset_root, "imgs", simg)) # For gaze360 dataset
+        img = Image.open(
+            os.path.join(self.dataset_root, simg)
+        )  # For gazefollow dataset
         img = img.convert("RGB")
         width, height = img.size
         org_width, org_height = width, height
