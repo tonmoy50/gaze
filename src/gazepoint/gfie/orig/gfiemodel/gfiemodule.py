@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from gfiemodel.resnet import resnet50
+import numpy as np
 
 
 class Encoder(nn.Module):
@@ -142,6 +143,8 @@ class PSFoVModule(nn.Module):
         gazevector = gazevector.unsqueeze(2)
 
         matrix_T = matrix_T.reshape([bs, -1, 3])
+
+        gazevector = np.hstack([gazevector, np.zeros((4, 1))])  # For Gazefollow dataset
 
         F = torch.matmul(matrix_T, gazevector)
         F = F.reshape([bs, 1, h, w])
