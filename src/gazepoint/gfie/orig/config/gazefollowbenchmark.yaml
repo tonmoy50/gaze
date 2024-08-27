@@ -1,0 +1,38 @@
+DATASET:
+
+  # root_dir: "/Users/tonmoy/Library/CloudStorage/OneDrive-IndianaUniversity/Research/Education Project/Data/gaze360/"
+  root_dir: /nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow/gazefollow_extended
+  rgb: "rgb"
+  depth: "depth"
+  camerapara: "CameraKinect.npy"
+
+  train: "train_annotations_release.csv"
+  valid: "valid_annotations_release.csv"
+  test: "test_annotations_release.csv"
+
+
+  train_batch_size: 16
+
+MODEL:
+  backboneptpath: "/extend/hzx/Model_para/ptbackbone.pt"
+
+TRAIN:
+  lr: 1e-4
+  weightDecay: 1e-4
+
+  resume: False
+  resume_add: ""
+
+  store: "./models/"
+
+  save_intervel: 5
+
+  end_epoch: 20
+
+OTHER:
+
+  lossrec_every: 100
+
+  evalrec_every: 1000
+
+  cpkt: "/extend/hzx/Model_para/GFIEpub_model/gfiemodel_11epoch.pth.tar"

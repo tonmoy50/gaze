@@ -16,13 +16,13 @@ from utils import img_utils
 import matplotlib.pyplot as plt
 
 
-class Gaze360Loader(object):
+class GazeFollowLoader(object):
 
     def __init__(self, opt):
 
-        self.train_gaze = Gaze360("train", opt, show=False)
-        self.val_gaze = Gaze360("valid", opt, show=False)
-        self.test_gaze = Gaze360("test", opt, show=False)
+        self.train_gaze = GazeFollow("train", opt, show=False)
+        self.val_gaze = GazeFollow("valid", opt, show=False)
+        self.test_gaze = GazeFollow("test", opt, show=False)
 
         self.train_loader = DataLoader(
             self.train_gaze,
@@ -49,7 +49,7 @@ class Gaze360Loader(object):
         )
 
 
-class Gaze360(Dataset):
+class GazeFollow(Dataset):
 
     def __init__(self, dstype, opt, show=False):
         self.dataset_root = opt.DATASET.root_dir
@@ -71,20 +71,20 @@ class Gaze360(Dataset):
 
         self.X_train = df[
             [
-                "simg",
-                "himg",
-                "h_x_min",
-                "h_y_min",
-                "h_x_max",
-                "h_y_max",
-                "eye_u",
-                "eye_v",
-                "eye_X",
-                "eye_Y",
-                "eye_Z",
+                "image_path",
+                # "himg",
+                "head_bbox_x_min",
+                "head_bbox_y_min",
+                "head_bbox_x_max",
+                "head_bbox_y_max",
+                "eye_x",
+                "eye_y",
+                # "eye_X",
+                # "eye_Y",
+                # "eye_Z",
             ]
         ]
-        self.Y_train = df[["gaze_u", "gaze_v", "gaze_X", "gaze_Y", "gaze_Z"]]
+        self.Y_train = df[["gaze_u", "gaze_v"]]  # , "gaze_X", "gaze_Y", "gaze_Z"]]
 
         self.length = len(df)
 
@@ -117,21 +117,22 @@ class Gaze360(Dataset):
         # scene_id,frame_index,h_x_min,h_y_min,h_x_max,h_y_max,eye_u,eye_v,eye_X,eye_Y,eye_Z=self.X_train.iloc[index]
         (
             simg,
-            himg,
+            # himg,
             h_x_min,
             h_y_min,
             h_x_max,
             h_y_max,
             eye_u,
             eye_v,
-            eye_X,
-            eye_Y,
-            eye_Z,
+            # eye_X,
+            # eye_Y,
+            # eye_Z,
         ) = self.X_train.iloc[index]
         # scene_id=str(int(scene_id))
         # frame_index=int(frame_index)
 
-        gaze_u, gaze_v, gaze_X, gaze_Y, gaze_Z = self.Y_train.iloc[index]
+        # gaze_u, gaze_v, gaze_X, gaze_Y, gaze_Z = self.Y_train.iloc[index]
+        gaze_u, gaze_v = self.Y_train.iloc[index]
 
         # rgb_path=os.path.join(self.rgb_path,self.dstype,"scene{}".format(scene_id),"{:04}.jpg".format(frame_index))
         # depth_path=os.path.join(self.depth_path,self.dstype,"scene{}".format(scene_id),"{:04}.npy".format(frame_index))
@@ -141,6 +142,8 @@ class Gaze360(Dataset):
         img = img.convert("RGB")
         width, height = img.size
         org_width, org_height = width, height
+
+        # himg = img.crop((int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max)))
 
         # load the depth image
         # depthimg=np.load(depth_path)
@@ -344,10 +347,10 @@ class Gaze360(Dataset):
         matrix_T = matrix_T.reshape([-1, 3])
         matrix_T = matrix_T.reshape([self.input_size, self.input_size, 3])
 
-        if flip_flag:
-            matrix_T = matrix_T - np.array([-eye_X, eye_Y, eye_Z])
-        else:
-            matrix_T = matrix_T - np.array([eye_X, eye_Y, eye_Z])
+        # if flip_flag:
+        #     matrix_T = matrix_T - np.array([-eye_X, eye_Y, eye_Z])
+        # else:
+        #     matrix_T = matrix_T - np.array([eye_X, eye_Y, eye_Z])
 
         norm_value = np.linalg.norm(matrix_T, axis=2, keepdims=True)
         norm_value[norm_value <= 0] = 1
@@ -358,16 +361,17 @@ class Gaze360(Dataset):
         matrix_T = torch.from_numpy(matrix_T).float()
 
         # generate the gaze vector label
-        gaze_vector = np.array([gaze_X - eye_X, gaze_Y - eye_Y, gaze_Z - eye_Z])
+        # gaze_vector = np.array([gaze_X - eye_X, gaze_Y - eye_Y, gaze_Z - eye_Z])
+        gaze_vector = np.array([gaze_u - eye_u, gaze_v - eye_v])
 
-        if flip_flag:
-            gaze_vector[0] = -gaze_vector[0]
+        # if flip_flag:
+        #     gaze_vector[0] = -gaze_vector[0]
 
         norm_gaze_vector = (
             1.0 if np.linalg.norm(gaze_vector) <= 0.0 else np.linalg.norm(gaze_vector)
         )
-        gaze_vector = gaze_vector / norm_gaze_vector
-        gaze_vector = torch.from_numpy(gaze_vector)
+        # gaze_vector = gaze_vector / norm_gaze_vector
+        # gaze_vector = torch.from_numpy(gaze_vector)
 
         # generate the heat map label
         gaze_heatmap = torch.zeros(
@@ -383,7 +387,7 @@ class Gaze360(Dataset):
 
         # auxilary info
         gaze_target2d = torch.from_numpy(np.array([gaze_u, gaze_v]))
-        matrix_T_heatmap = np.dot(matrix_T, gaze_vector)
+        # matrix_T_heatmap = np.dot(matrix_T, gaze_vector)
 
         all_data = {}
         all_data["simg"] = img
