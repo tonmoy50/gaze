@@ -145,7 +145,7 @@ class PSFoVModule(nn.Module):
         matrix_T = matrix_T.reshape([bs, -1, 3])
 
         gazevector = np.hstack(
-            [gazevector.cpu().numpy(), np.zeros((4, 1))]
+            [gazevector.detach().numpy(), np.zeros((4, 1))]
         )  # For Gazefollow dataset
         gazevector = torch.from_numpy(gazevector).to(device="cuda:0")
 
