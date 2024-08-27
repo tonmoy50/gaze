@@ -84,7 +84,7 @@ class GazeFollow(Dataset):
                 # "eye_Z",
             ]
         ]
-        self.Y_train = df[["gaze_u", "gaze_v"]]  # , "gaze_X", "gaze_Y", "gaze_Z"]]
+        self.Y_train = df[["gaze_x", "gaze_y"]]  # , "gaze_X", "gaze_Y", "gaze_Z"]]
 
         self.length = len(df)
 
