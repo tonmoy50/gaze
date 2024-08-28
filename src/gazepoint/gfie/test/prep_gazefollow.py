@@ -66,7 +66,11 @@ def prep_annotations(filename, dtype):
             # meta2_,
         ) = line.split(",")[:15]
 
-        if in_or_out_ != "-1":
+        if (
+            in_or_out_ != "-1"
+            and head_bbox_x_max_ > head_bbox_x_min_
+            and head_bbox_y_max_ > head_bbox_y_min_
+        ):
 
             image_path.append(image_path_)
             id.append(id_)
