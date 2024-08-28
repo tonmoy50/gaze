@@ -11,15 +11,15 @@ from transformers import pipeline
 
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-# DATASET_DIR = os.path.join(
-#     os.path.dirname(
-#         os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(CUR_DIR))))
-#     ),
-#     "Data",
-#     "gazefollow_extended",
-# )
+DATASET_DIR = os.path.join(
+    os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(CUR_DIR))))
+    ),
+    "Data",
+    "gazefollow_extended",
+)
 
-DATASET_DIR = "/nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow/gazefollow_extended"
+# DATASET_DIR = "/nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow/gazefollow_extended"
 
 
 def prep_annotations(filename, dtype):
@@ -158,25 +158,35 @@ def make_depth_image(path, depth_estimator):
     # depth = depth_estimator(img)["depth"]
 
 
-def main():
-    checkpoint = "vinvino02/glpn-nyu"
-    checkpoint = "depth-anything/Depth-Anything-V2-base-hf"
-    depth_estimator = pipeline(
-        "depth-estimation",
-        model=checkpoint,
-        device=0,
-        features=256,
-        out_channels=[256, 512, 1024, 1024],
-    )
+def test_headcrop():
+    img = Image.open(os.path.join(DATASET_DIR, "train/00000085/00085008.jpg"))
+    # Image._show(img)
 
-    prep_annotations(filename="train_annotations_release.txt", dtype="train")
-    prep_annotations(filename="test_annotations_release.txt", dtype="test")
+    cropped_head = img.crop((121.856, 26.146, 365.568, 381.42400000000004))
+    Image._show(cropped_head)
+
+
+def main():
+    # checkpoint = "vinvino02/glpn-nyu"
+    # checkpoint = "depth-anything/Depth-Anything-V2-base-hf"
+    # depth_estimator = pipeline(
+    #     "depth-estimation",
+    #     model=checkpoint,
+    #     device=0,
+    #     features=256,
+    #     out_channels=[256, 512, 1024, 1024],
+    # )
+
+    # prep_annotations(filename="train_annotations_release.txt", dtype="train")
+    # prep_annotations(filename="test_annotations_release.txt", dtype="test")
     # make_depth_image(
     #     os.path.join(DATASET_DIR, "train_annotations_release.txt"), depth_estimator
     # )
     # make_depth_image(
     #     os.path.join(DATASET_DIR, "test_annotations_release.txt"), depth_estimator
     # )
+
+    test_headcrop()
 
 
 if __name__ == "__main__":

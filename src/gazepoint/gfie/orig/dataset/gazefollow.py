@@ -300,6 +300,7 @@ class GazeFollow(Dataset):
         final_width, final_height = img.size
 
         # crop the face
+        print(simg, x_min, y_min, x_max, y_max)
         headimg = img.crop(
             (int(x_min), int(y_min), int(x_max), int(y_max))
         )  # Open for gazefollow dataset and/or GFIE dataset
