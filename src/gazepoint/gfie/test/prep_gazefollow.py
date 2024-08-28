@@ -11,15 +11,15 @@ from transformers import pipeline
 
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASET_DIR = os.path.join(
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(CUR_DIR))))
-    ),
-    "Data",
-    "gazefollow_extended",
-)
+# DATASET_DIR = os.path.join(
+#     os.path.dirname(
+#         os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(CUR_DIR))))
+#     ),
+#     "Data",
+#     "gazefollow_extended",
+# )
 
-# DATASET_DIR = "/nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow/gazefollow_extended"
+DATASET_DIR = "/nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow/gazefollow_extended"
 
 
 def prep_annotations(filename, dtype):
