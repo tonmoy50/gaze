@@ -11,15 +11,15 @@ from transformers import pipeline
 
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-# DATASET_DIR = os.path.join(
-#     os.path.dirname(
-#         os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(CUR_DIR))))
-#     ),
-#     "Data",
-#     "gazefollow_extended",
-# )
+DATASET_DIR = os.path.join(
+    os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(CUR_DIR))))
+    ),
+    "Data",
+    "gazefollow_extended",
+)
 
-DATASET_DIR = "/nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow/gazefollow_extended"
+# DATASET_DIR = "/nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow/gazefollow_extended"
 
 
 def prep_annotations(filename, dtype):
@@ -66,7 +66,7 @@ def prep_annotations(filename, dtype):
             # meta2_,
         ) = line.split(",")[:15]
 
-        if in_or_out_ != -1:
+        if in_or_out_ != "-1":
 
             image_path.append(image_path_)
             id.append(id_)
@@ -82,7 +82,7 @@ def prep_annotations(filename, dtype):
             head_bbox_y_min.append(head_bbox_y_min_)
             head_bbox_x_max.append(head_bbox_x_max_)
             head_bbox_y_max.append(head_bbox_y_max_)
-            # in_or_out.append(in_or_out_)
+            in_or_out.append(in_or_out_)
 
     df = pd.DataFrame(
         {
@@ -100,7 +100,7 @@ def prep_annotations(filename, dtype):
             "head_bbox_y_min": head_bbox_y_min,
             "head_bbox_x_max": head_bbox_x_max,
             "head_bbox_y_max": head_bbox_y_max,
-            # "in_or_out": in_or_out,
+            "in_or_out": in_or_out,
         }
     )
 
