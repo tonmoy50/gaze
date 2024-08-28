@@ -144,14 +144,14 @@ class PSFoVModule(nn.Module):
 
         matrix_T = matrix_T.reshape([bs, -1, 3])
 
-        gazevector = gazevector.detach().cpu().numpy()
+        # gazevector = gazevector.detach().cpu().numpy()
 
-        array_4x3 = np.zeros((4, 3))
-        array_4x3[:, :2] = gazevector
-        gazevector = array_4x3
+        # array_4x3 = np.zeros((4, 3))
+        # array_4x3[:, :2] = gazevector
+        # gazevector = array_4x3
 
         # gazevector = np.hstack([gazevector, np.zeros((4, 1))])
-        gazevector = torch.from_numpy(gazevector).to(device="cuda:0")
+        # gazevector = torch.from_numpy(gazevector).to(device="cuda:0")
         # gazevector = gaze
         # gazevector = np.hstack(
         #     [gazevector.detach().numpy(), np.zeros((4, 1))]

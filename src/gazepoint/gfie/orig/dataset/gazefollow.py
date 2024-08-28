@@ -367,7 +367,7 @@ class GazeFollow(Dataset):
 
         # generate the gaze vector label
         # gaze_vector = np.array([gaze_X - eye_X, gaze_Y - eye_Y, gaze_Z - eye_Z])
-        gaze_vector = np.array([gaze_u - eye_u, gaze_v - eye_v])
+        gaze_vector = np.array([gaze_u - eye_u, gaze_v - eye_v, 0])
 
         # if flip_flag:
         #     gaze_vector[0] = -gaze_vector[0]
