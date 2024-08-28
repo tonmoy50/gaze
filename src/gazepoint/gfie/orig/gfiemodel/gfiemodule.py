@@ -98,7 +98,7 @@ class EGDModule(nn.Module):
         self.backbone = nn.Sequential(*list(org_resnet50.children())[:-1])
 
         self.fc = nn.Sequential(
-            nn.Linear(2048, 256), nn.ReLU(), nn.Linear(256, 2)
+            nn.Linear(2048, 256), nn.ReLU(), nn.Linear(256, 3)
         )  # In nn.Linear(256,3) Or nn.Linear(256,2) --> 3 or 2 is the dimension of the gaze vector
 
     def forward(self, himg):
