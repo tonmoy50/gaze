@@ -61,26 +61,28 @@ def prep_annotations(filename, dtype):
             head_bbox_y_min_,
             head_bbox_x_max_,
             head_bbox_y_max_,
-            # in_or_out_,
+            in_or_out_,
             # meta1_,
             # meta2_,
-        ) = line.split(",")[:14]
+        ) = line.split(",")[:15]
 
-        image_path.append(image_path_)
-        id.append(id_)
-        body_bbox_x.append(body_bbox_x_)
-        body_bbox_y.append(body_bbox_y_)
-        body_bbox_width.append(body_bbox_width_)
-        body_bbox_height.append(body_bbox_height_)
-        eye_x.append(eye_x_)
-        eye_y.append(eye_y_)
-        gaze_x.append(gaze_x_)
-        gaze_y.append(gaze_y_)
-        head_bbox_x_min.append(head_bbox_x_min_)
-        head_bbox_y_min.append(head_bbox_y_min_)
-        head_bbox_x_max.append(head_bbox_x_max_)
-        head_bbox_y_max.append(head_bbox_y_max_)
-        # in_or_out.append(in_or_out_)
+        if in_or_out_ != -1:
+
+            image_path.append(image_path_)
+            id.append(id_)
+            body_bbox_x.append(body_bbox_x_)
+            body_bbox_y.append(body_bbox_y_)
+            body_bbox_width.append(body_bbox_width_)
+            body_bbox_height.append(body_bbox_height_)
+            eye_x.append(eye_x_)
+            eye_y.append(eye_y_)
+            gaze_x.append(gaze_x_)
+            gaze_y.append(gaze_y_)
+            head_bbox_x_min.append(head_bbox_x_min_)
+            head_bbox_y_min.append(head_bbox_y_min_)
+            head_bbox_x_max.append(head_bbox_x_max_)
+            head_bbox_y_max.append(head_bbox_y_max_)
+            # in_or_out.append(in_or_out_)
 
     df = pd.DataFrame(
         {
@@ -165,12 +167,12 @@ def main():
 
     prep_annotations(filename="train_annotations_release.txt", dtype="train")
     prep_annotations(filename="test_annotations_release.txt", dtype="test")
-    make_depth_image(
-        os.path.join(DATASET_DIR, "train_annotations_release.txt"), depth_estimator
-    )
-    make_depth_image(
-        os.path.join(DATASET_DIR, "test_annotations_release.txt"), depth_estimator
-    )
+    # make_depth_image(
+    #     os.path.join(DATASET_DIR, "train_annotations_release.txt"), depth_estimator
+    # )
+    # make_depth_image(
+    #     os.path.join(DATASET_DIR, "test_annotations_release.txt"), depth_estimator
+    # )
 
 
 if __name__ == "__main__":
