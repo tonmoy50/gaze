@@ -146,6 +146,13 @@ class GazeFollow(Dataset):
         width, height = img.size
         org_width, org_height = width, height
 
+        # crop the face
+        # print(simg, x_min, y_min, x_max, y_max)
+        headimg = img.crop(
+            (int(x_min), int(y_min), int(x_max), int(y_max))
+        )  # Open for gazefollow dataset and/or GFIE dataset
+        # headimg = Image.open(os.path.join(self.dataset_root, "imgs", simg)) # Open for gaze360 dataset
+        headimg = headimg.convert("RGB")
         # himg = img.crop((int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max)))
 
         # load the depth image
@@ -298,14 +305,6 @@ class GazeFollow(Dataset):
 
         # the final image size in train/valid/test
         final_width, final_height = img.size
-
-        # crop the face
-        print(simg, x_min, y_min, x_max, y_max)
-        headimg = img.crop(
-            (int(x_min), int(y_min), int(x_max), int(y_max))
-        )  # Open for gazefollow dataset and/or GFIE dataset
-        # headimg = Image.open(os.path.join(self.dataset_root, "imgs", simg)) # Open for gaze360 dataset
-        headimg = headimg.convert("RGB")
 
         # set for display
         if self.imshow:
