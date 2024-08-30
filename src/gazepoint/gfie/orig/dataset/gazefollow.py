@@ -152,7 +152,17 @@ class GazeFollow(Dataset):
             # himg = img.crop((int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max)))
         except Exception as e:
             print(simg, int(h_x_max), int(h_x_min), int(h_y_max), int(h_y_min))
-            raise e
+            temp_holder = h_x_max
+            h_x_max = h_x_min
+            h_x_min = temp_holder
+            temp_holder = h_y_max
+            h_y_max = h_y_min
+            h_y_min = temp_holder
+            del temp_holder
+            headimg = img.crop(
+                (int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max))
+            )  # Open for gazefollow dataset and/or GFIE dataset
+            headimg = headimg.convert("RGB")
 
         img = img.convert("RGB")
         width, height = img.size
