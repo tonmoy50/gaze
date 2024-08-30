@@ -149,7 +149,7 @@ class GazeFollow(Dataset):
         # crop the face
         # print(simg, x_min, y_min, x_max, y_max)
         headimg = img.crop(
-            (int(x_min), int(y_min), int(x_max), int(y_max))
+            (int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max))
         )  # Open for gazefollow dataset and/or GFIE dataset
         # headimg = Image.open(os.path.join(self.dataset_root, "imgs", simg)) # Open for gaze360 dataset
         headimg = headimg.convert("RGB")
