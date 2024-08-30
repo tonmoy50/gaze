@@ -148,12 +148,16 @@ class GazeFollow(Dataset):
 
         # crop the face
         # print(simg, x_min, y_min, x_max, y_max)
-        headimg = img.crop(
-            (int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max))
-        )  # Open for gazefollow dataset and/or GFIE dataset
-        # headimg = Image.open(os.path.join(self.dataset_root, "imgs", simg)) # Open for gaze360 dataset
-        headimg = headimg.convert("RGB")
-        # himg = img.crop((int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max)))
+        try:
+            headimg = img.crop(
+                (int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max))
+            )  # Open for gazefollow dataset and/or GFIE dataset
+            # headimg = Image.open(os.path.join(self.dataset_root, "imgs", simg)) # Open for gaze360 dataset
+            headimg = headimg.convert("RGB")
+            # himg = img.crop((int(h_x_min), int(h_y_min), int(h_x_max), int(h_y_max)))
+        except Exception as e:
+            print(int(h_x_max), int(h_x_min), int(h_y_max), int(h_y_min))
+            raise e
 
         # load the depth image
         # depthimg=np.load(depth_path)
