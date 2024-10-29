@@ -12,6 +12,7 @@ root = pyrootutils.setup_root(
     pythonpath=True,
     dotenv=True,
 )
+print("Root: ", type(root))
 
 # ------------------------------------------------------------------------------------ #
 # `pyrootutils.setup_root(...)` is an optional line at the top of each entry file
@@ -128,7 +129,7 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
     return metric_dict, object_dict
 
 
-@hydra.main(version_base="1.2", config_path=root / "configs", config_name="train.yaml")
+@hydra.main(version_base="1.2", config_path=f"""{str(root)}/configs""", config_name="train.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
 
     # train the model

@@ -50,8 +50,7 @@ if __name__ == "__main__":
     )
     df = df.groupby("path")
 
-    # model = get_model("resnet50_2020-07-20", max_size=2048, device="cuda")
-    model = get_model("resnet50_2020-07-20", max_size=2048, device="cpu")
+    model = get_model("resnet50_2020-07-20", max_size=2048, device="cuda")
     model.eval()
     paths = list(df.groups.keys())
 
