@@ -32,6 +32,7 @@ def train_engine(opt):
 
     best_dist_error = sys.maxsize
     best_cosine_error = sys.maxsize
+    best_dist3d_error = sys.maxsize
     # init gaze model
     gazemodel = init_model(opt)
     gazemodel = torch.nn.DataParallel(gazemodel)
@@ -42,6 +43,8 @@ def train_engine(opt):
     writer = False
     # create log dir for tensorboardx
     if writer is not None:
+        import tensorflow as tf
+
         opt.OTHER.logdir = os.path.join(
             opt.OTHER.logdir, datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         )
@@ -50,6 +53,9 @@ def train_engine(opt):
             shutil.rmtree(opt.OTHER.logdir)
         os.makedirs(opt.OTHER.logdir)
         writer = SummaryWriter(opt.OTHER.logdir)
+        tf.debugging.experimental.enable_dump_debug_info(
+            opt.OTHER.logdir, tensor_debug_mode="FULL_HEALTH", circular_buffer_size=-1
+        )
 
     # set random seed for reduce the randomness
     random.seed(opt.OTHER.seed)
@@ -86,7 +92,7 @@ def train_engine(opt):
 
     tester = Tester(gazemodel, criterion, test_loader, opt, writer=writer)
 
-    trainer.get_best_error(best_dist_error, best_cosine_error)
+    trainer.get_best_error(best_dist_error, best_cosine_error, best_dist3d_error)
 
     optimizer.zero_grad()
 
@@ -117,14 +123,12 @@ def train_engine(opt):
                 gazemodel, optimizer, valid_error, trainer.best_flag, epoch, opt
             )
 
-
-
         time.sleep(0.03)
 
-        dist_error, gaze_error = tester.test(epoch, opt)
+        dist_error, gaze_error, dist3d_error = tester.test(epoch, opt)
         print(
-            "current error| L2 dist: {:.2f}/Gaze cosine {:.2f}".format(
-                dist_error, gaze_error
+            "current error| L2 dist: {:.2f}/Gaze cosine {:.2f}/L2 dist3d: {:.2f}".format(
+                dist_error, gaze_error, dist3d_error
             )
         )
 
