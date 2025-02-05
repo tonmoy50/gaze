@@ -5,7 +5,7 @@ root_dir: ${oc.env:PROJECT_ROOT}
 
 # path to data directory
 # data_dir: ${paths.root_dir}/data/
-data_dir: /Users/tonmoy/Library/CloudStorage/OneDrive-IndianaUniversity/Research/Education Project/Data/GazeFollow Dataset
+data_dir: "/nfs/magnezone/data/ssd/nhaldert/datasets/Gazefollow"
 
 # path to logging directory
 log_dir: ${paths.root_dir}/logs/

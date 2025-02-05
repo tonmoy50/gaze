@@ -71,7 +71,8 @@ def train_engine(opt):
             raise Exception("No such checkpoint file")
 
     # dataloader = Gaze360Loader(opt)
-    dataloader = GazeFollowLoader(opt)
+    # dataloader = GazeFollowLoader(opt)
+    dataloader = GFIELoader(opt)
     train_loader = dataloader.train_loader
     val_loader = dataloader.val_loader
     test_loader = dataloader.test_loader
@@ -116,6 +117,8 @@ def train_engine(opt):
                 gazemodel, optimizer, valid_error, trainer.best_flag, epoch, opt
             )
 
+
+
         time.sleep(0.03)
 
         dist_error, gaze_error = tester.test(epoch, opt)
@@ -133,8 +136,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--cfg",
         # default="config/gaze360.yaml",
-        # default="config/gfiebenchmark.yaml",
-        default="config/gazefollowbenchmark.yaml",
+        default="config/gfiebenchmark.yaml",
+        # default="config/gazefollowbenchmark.yaml",
         metavar="FILE",
         help="path to config file",
         type=str,

@@ -25,4 +25,4 @@ evaluation: ${evaluation}
 n_of_images_to_log: ${datamodule.batch_size}
 gaze_vector_type: ${datamodule.gaze_vector_type}
 # Add here the path to the pretrained od model
-net_pretraining:
+net_pretraining: gotd_gazefollow.pth

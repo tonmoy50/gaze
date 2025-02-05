@@ -13,7 +13,7 @@ DATASET:
   train_batch_size: 32
 
 MODEL:
-  backboneptpath: "./gfiemodels"
+  backboneptpath: "./models"
 
 TRAIN:
   lr: 1e-4
@@ -22,7 +22,7 @@ TRAIN:
   resume: False
   resume_add: ""
 
-  store: "./gfiemodels/"
+  store: "./models/"
 
   save_intervel: 5
 

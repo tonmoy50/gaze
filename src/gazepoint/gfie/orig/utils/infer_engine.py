@@ -185,6 +185,174 @@ class GFIETestDataset(Dataset):
 
 
 class CAD120TestDataset(Dataset):
+
+    def __init__(self,opt):
+
+        super(CAD120TestDataset,self).__init__()
+
+        rgb_path=os.path.join(opt.DATASET.root_dir,opt.DATASET.rgb)
+        depth_path=os.path.join(opt.DATASET.root_dir,opt.DATASET.depth)
+
+        camerapara=np.load(os.path.join(opt.DATASET.root_dir,opt.DATASET.camerapara))
+
+        annofile_path = os.path.join(opt.DATASET.root_dir, opt.DATASET.test)
+
+        self.input_size=opt.TRAIN.input_size
+
+        df=pd.read_csv(annofile_path)
+
+        self.X_train = df[['dataset_id', 'frame_index', "x_initial","y_initial","w","h", 'eye_x', 'eye_y', 'eye_X', 'eye_Y','eye_Z']]
+
+        self.Y_train = df[['gaze_x', 'gaze_y', 'gaze_X', 'gaze_Y', 'gaze_Z']]
+
+        self.length=len(df)
+
+        self.rgb_path=rgb_path
+        self.depth_path=depth_path
+        self.camerapara=camerapara
+
+        self.input_size=opt.TRAIN.input_size
+        self.output_size=opt.TRAIN.output_size
+
+        transform_list = []
+        transform_list.append(transforms.Resize((opt.TRAIN.input_size, opt.TRAIN.input_size)))
+        transform_list.append(transforms.ToTensor())
+        transform_list.append(transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
+        self.transform = transforms.Compose(transform_list)
+
+    def __getitem__(self, index):
+        scene_id, frame_index, h_x_min, h_y_min, h_w, h_h, eye_u, eye_v, eye_X, eye_Y, eye_Z = self.X_train.iloc[index]
+
+        frame_index = int(frame_index)
+
+        gaze_u, gaze_v,gaze_X, gaze_Y, gaze_Z = self.Y_train.iloc[index]
+
+        rgb_path=os.path.join(self.rgb_path,"{}".format(scene_id),"RGB_{}.png".format(frame_index))
+        depth_path=os.path.join(self.depth_path,"{}".format(scene_id),"Depth_{}.png".format(frame_index))
+
+        head_bbox=[h_x_min, h_y_min, h_w, h_h]
+
+        eye_3d=np.array([eye_X,eye_Y,eye_Z])
+        gaze_target_2d=np.array([gaze_u,gaze_v])
+        gaze_target_3d=np.array([gaze_X,gaze_Y,gaze_Z])
+
+        # format input
+        format_input=self.format_model_input(rgb_path,depth_path,head_bbox,self.camerapara,eye_3d,index)
+
+        # generate GT
+        groundtruth=self.getGroundTruth(eye_3d,gaze_target_2d,gaze_target_3d)
+
+
+        all_data={}
+        all_data['simg'] = format_input["simg"]
+        all_data["himg"] = format_input["himg"]
+        all_data["headloc"] = format_input["headloc"]
+        all_data["matrixT"]=format_input["matrixT"]
+        all_data['depthmap'] = format_input["depthmap"]
+        all_data["eye3d"]=eye_3d
+
+        all_data["gt_gaze_vector"]=groundtruth["gaze_vector"]
+        all_data["gt_gaze_target2d"]=groundtruth["gaze_target2d"]
+        all_data["gt_gaze_target3d"]=groundtruth["gaze_target3d"]
+
+        return all_data
+
+    def __len__(self):
+        return self.length
+
+    def format_model_input(self,rgb_path,depth_path,head_bbox,campara,eye_coord,index=None):
+
+        rgbimg=Image.open(rgb_path)
+        rgbimg = rgbimg.convert('RGB')
+
+        depthimg= Image.open(depth_path)
+        depthimg= np.array(depthimg).astype(np.float)
+        depthimg= depthimg/1000.
+
+        depthimg=Image.fromarray(depthimg)
+
+        width, height = rgbimg.size
+        self.img_para=[width,height]
+
+        # convert to image coordinate system
+        head_bbox=np.array(head_bbox)
+        head_bbox[2:]=head_bbox[2:]+head_bbox[0:2]
+        head_bbox=head_bbox*np.array([width,height,width,height])
+
+        # expand the head bounding box (in pixel coordinate )
+        x_min, y_min, x_max, y_max=map(float,img_utils.expand_head_box(head_bbox
+                                                             ,[width,height]))
+
+        # crop the head
+        head = rgbimg.crop((int(x_min), int(y_min), int(x_max), int(y_max)))
+
+        # represent the head location with mask
+        head_loc = img_utils.get_head_box_channel(x_min, y_min, x_max, y_max, width, height,
+                                                    resolution=self.input_size, coordconv=False).unsqueeze(0)
+
+        # to tensor
+        rgbimg=self.transform(rgbimg)
+        headimg=self.transform(head)
+
+        # generate the matrix_T
+        depthmap=depthimg.resize((self.input_size,self.input_size),Image.NEAREST)
+        depthmap=np.array(depthmap)
+
+        matrix_T=self.getMatrixT(depthmap,campara,eye_coord,index)
+
+        # reserved for strategy for 3D gaze-following
+        depthvalue=depthimg.copy()
+        depthvalue=np.array(depthvalue)
+
+        format_input={}
+        format_input['simg']=rgbimg
+        format_input['himg']=headimg
+        format_input['headloc']=head_loc
+        format_input['matrixT']=matrix_T
+        format_input['depthmap']=depthvalue
+
+        return format_input
+
+    def getGroundTruth(self,eye3d,gt2d,gt3d):
+
+        gaze_vector=gt3d-eye3d
+        norm_gaze_vector = 1.0 if np.linalg.norm(gaze_vector) <= 0.0 else np.linalg.norm(gaze_vector)
+        gaze_vector=gaze_vector/norm_gaze_vector
+
+        ground_truth={}
+        ground_truth["gaze_vector"]=gaze_vector
+        ground_truth["gaze_target2d"]=gt2d
+        ground_truth["gaze_target3d"]=gt3d
+
+        return ground_truth
+
+    def getMatrixT(self,dmap,camera_p,eye_3d,index=None):
+
+        img_W,img_H=self.img_para
+        fx, fy,cx, cy = camera_p
+
+        # construct empty matrix
+        matrix_T_DW = np.linspace(0, self.input_size - 1, self.input_size)
+        matrix_T_DH = np.linspace(0, self.input_size - 1, self.input_size)
+        [matrix_T_xx, matrix_T_yy] = np.meshgrid(matrix_T_DW, matrix_T_DH)
+
+        scale_width, scale_height = img_W / self.input_size, img_H / self.input_size
+
+        matrix_T_X = (matrix_T_xx*scale_width - cx) * dmap /fx
+        matrix_T_Y = (matrix_T_yy*scale_height  - cy) * dmap /fy
+        matrix_T_Z = dmap
+
+        matrix_T = np.dstack((matrix_T_X, matrix_T_Y, matrix_T_Z))
+
+        matrix_T = matrix_T- eye_3d
+
+        norm_value = np.linalg.norm(matrix_T, axis=2, keepdims=True)
+        norm_value[norm_value <= 0] = 1
+
+        matrix_T = matrix_T / norm_value
+        matrix_T[dmap==0]=np.zeros_like(matrix_T[dmap==0])
+        matrix_T=torch.from_numpy(matrix_T).float()
+
         return matrix_T
 
 def collate_fn(batch):

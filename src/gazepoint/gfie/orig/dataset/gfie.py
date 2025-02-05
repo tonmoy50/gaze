@@ -113,6 +113,9 @@ class GFIEDataset(Dataset):
         depthimg=depthimg.astype(np.float32)
         depthimg=Image.fromarray(depthimg)
 
+        depthvalue=depthimg.copy()
+        depthvalue=np.array(depthvalue)
+
         # expand face bbox a bit
         k=0.1
         h_x_min -= k * abs(h_x_max - h_x_min)
@@ -339,11 +342,15 @@ class GFIEDataset(Dataset):
         all_data["himg"] = headimg
         all_data["headloc"] = head_channel
         all_data["matrixT"]=matrix_T
+        all_data["eye3d"] = torch.tensor([eye_X, eye_Y, eye_Z])
+        all_data["depthmap"] = torch.from_numpy(depthvalue)
+        all_data["campara"] = torch.tensor(self.camerapara)
 
         # Y_label
         all_data["gaze_heatmap"] = gaze_heatmap
         all_data["gaze_vector"] = gaze_vector
         all_data["gaze_target2d"] = gaze_target2d
+        all_data["gaze_target3d"] = torch.from_numpy(np.array([gaze_X,gaze_Y,gaze_Z]) - np.array([eye_X, eye_Y, eye_Z]))
 
         return all_data
 
@@ -360,11 +367,15 @@ def collate_fn(batch):
     batch_data["himg"]=[]
     batch_data["headloc"]=[]
     batch_data["matrixT"]=[]
+    batch_data["eye3d"]=[]
+    batch_data["depthmap"]=[]
+    batch_data["campara"]=[]
 
 
     batch_data["gaze_heatmap"]=[]
     batch_data["gaze_vector"]=[]
     batch_data["gaze_target2d"]=[]
+    batch_data["gaze_target3d"]=[]
 
 
     for data in batch:
@@ -372,10 +383,14 @@ def collate_fn(batch):
         batch_data["himg"].append(data["himg"])
         batch_data["headloc"].append(data["headloc"])
         batch_data["matrixT"].append(data["matrixT"])
+        batch_data["eye3d"].append(data["eye3d"])
+        batch_data["depthmap"].append(data["depthmap"])
+        batch_data["campara"].append(data["campara"])
 
         batch_data["gaze_heatmap"].append(data["gaze_heatmap"])
         batch_data["gaze_vector"].append(data["gaze_vector"])
         batch_data["gaze_target2d"].append(data["gaze_target2d"])
+        batch_data["gaze_target3d"].append(data["gaze_target3d"])
 
 
     # train data
@@ -383,11 +398,15 @@ def collate_fn(batch):
     batch_data["himg"]=torch.stack(batch_data["himg"],0)
     batch_data["headloc"]=torch.stack(batch_data["headloc"],0)
     batch_data["matrixT"]=torch.stack(batch_data["matrixT"],0)
+    batch_data["eye3d"]=torch.stack(batch_data["eye3d"],0)
+    batch_data["depthmap"]=torch.stack(batch_data["depthmap"],0)
+    batch_data["campara"]=torch.stack(batch_data["campara"],0)
 
 
     # label data
     batch_data["gaze_heatmap"]=torch.stack(batch_data["gaze_heatmap"],0)
     batch_data["gaze_vector"] = torch.stack(batch_data["gaze_vector"], 0)
     batch_data["gaze_target2d"] = torch.stack(batch_data["gaze_target2d"], 0)
+    batch_data["gaze_target3d"] = torch.stack(batch_data["gaze_target3d"], 0)
 
     return batch_data

@@ -87,7 +87,6 @@ class Trainer(object):
             pred_gvec=outs["pred_gazevector"]
             pred_gvec=pred_gvec.squeeze()
 
-
             # gaze heatmap loss
             l2_loss=self.criterion[0](pred_gheatmap,y_gaze_heatmap)
             l2_loss=torch.mean(l2_loss,dim=1)
@@ -151,6 +150,7 @@ class Trainer(object):
                              learning_rate=self.optimizer.param_groups[0]["lr"])
 
             pbar.update(1)
+            # break
 
         pbar.close()
 

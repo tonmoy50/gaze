@@ -12,7 +12,7 @@ root = pyrootutils.setup_root(
     pythonpath=True,
     dotenv=True,
 )
-print("Root: ", type(root))
+# print("Root: ", type(root))
 
 # ------------------------------------------------------------------------------------ #
 # `pyrootutils.setup_root(...)` is an optional line at the top of each entry file
