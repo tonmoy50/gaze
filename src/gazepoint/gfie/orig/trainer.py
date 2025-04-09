@@ -257,6 +257,7 @@ class Trainer(object):
 
         self.eval_dist.reset()
         self.eval_cosine.reset()
+        self.eval_dist3d.reset()
 
         for i, data in enumerate(self.valloader, 0):
 
@@ -278,16 +279,16 @@ class Trainer(object):
 
             pred_heatmap = outs["pred_heatmap"]
             pred_heatmap = pred_heatmap.squeeze(1)
-            pred_heatmap = pred_heatmap.data.cpu().numpy()
+            # pred_heatmap = pred_heatmap.data.cpu().numpy()
 
             pred_gazevector = outs["pred_gazevector"]
-            pred_gazevector = pred_gazevector.data.cpu().numpy()
+            # pred_gazevector = pred_gazevector.data.cpu().numpy()
             gaze_vector = gaze_vector.numpy()
 
-            distval = euclid_dist(pred_heatmap, gaze_target2d)
-            cosineval = cosine_sim(pred_gazevector, gaze_vector)
+            distval = euclid_dist(pred_heatmap.data.cpu().numpy(), gaze_target2d)
+            cosineval = cosine_sim(pred_gazevector.data.cpu().numpy(), gaze_vector)
 
-            self.get_3D_dist_error(
+            l2loss_3d = self.get_3D_dist_error(
                 data, bs, pred_heatmap, pred_gazevector, gaze_target3d
             )
 
@@ -298,5 +299,6 @@ class Trainer(object):
             self.eval_cosine.update(cosineval, bs)
 
             # eval l2 distance between prdicted 3d gaze target and GT
+            self.eval_dist3d.update(l2loss_3d, bs)
 
         self.model.train()

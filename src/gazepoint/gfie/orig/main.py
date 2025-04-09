@@ -109,11 +109,11 @@ def train_engine(opt):
         trainer.train(epoch, opt)
 
         # save the parameters of model
-        if epoch % opt.TRAIN.save_intervel == 0:
+        # if epoch % opt.TRAIN.save_intervel == 0:
 
-            valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
+        #     valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
 
-            save_checkpoint(gazemodel, optimizer, valid_error, False, epoch, opt)
+        #     save_checkpoint(gazemodel, optimizer, valid_error, False, epoch, opt)
 
         # save the parameters of model with the best performance on valid dataset
         if trainer.best_flag:

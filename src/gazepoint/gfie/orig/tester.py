@@ -153,7 +153,7 @@ class Tester(object):
                 "Test cosine", self.test_cosine.avg, global_step=opt.OTHER.global_step
             )
             self.writer.add_scalar(
-                "3D Test dist", self.test_dist3d.avg, global_step=opt.OTHER.global_step
+                "Test dist 3D", self.test_dist3d.avg, global_step=opt.OTHER.global_step
             )
             # self.writer.add_scalar("3D Eval cosine", self.eval_batch_3Ddist.avg, global_step=opt.OTHER.global_step)
 
