@@ -30,6 +30,7 @@ def init_model(opt):
     model.psfov_module.apply(weights_init)
     model.ggh_module.decoder.apply(weights_init)
 
+    model = nn.DataParallel(model)
     model = model.to(opt.OTHER.device)
     return model
 

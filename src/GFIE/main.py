@@ -33,7 +33,7 @@ def train_engine(opt):
     best_cosine_error = sys.maxsize
     # init gaze model
     gazemodel = init_model(opt)
-    gazemodel = nn.DataParallel(gazemodel)
+    # print(gazemodel)
 
     # set criterion and optimizer for gaze model
     criterion, optimizer = setup_model(gazemodel, opt)
@@ -50,6 +50,7 @@ def train_engine(opt):
         os.makedirs(opt.OTHER.logdir)
         writer = SummaryWriter(opt.OTHER.logdir)
 
+    # writer.add_text("INFO", opt.dump(), global_step=opt.OTHER.global_step)
     # set random seed for reduce the randomness
     random.seed(opt.OTHER.seed)
     np.random.seed(opt.OTHER.seed)
@@ -90,6 +91,14 @@ def train_engine(opt):
 
     for epoch in range(opt.TRAIN.start_epoch, opt.TRAIN.end_epoch):
 
+        writer.add_text(
+            "INFO",
+            "Epoch number:{} | Learning rate:{}\n".format(
+                epoch, optimizer.param_groups[0]["lr"]
+            ),
+            global_step=opt.OTHER.global_step,
+        )
+
         print(
             "Epoch number:{} | Learning rate:{}\n".format(
                 epoch, optimizer.param_groups[0]["lr"]
@@ -115,12 +124,20 @@ def train_engine(opt):
 
         time.sleep(0.03)
 
-        dist_error, gaze_error = tester.test(epoch, opt)
+        dist_error, gaze_error, dist3d_error = tester.test(epoch, opt)
         print(
-            "current error| L2 dist: {:.2f}/Gaze cosine {:.2f}".format(
-                dist_error, gaze_error
+            "current error| L2 dist: {:.2f}/Gaze cosine {:.2f}/L2 dist3d: {:.2f}".format(
+                dist_error, gaze_error, dist3d_error
             )
         )
+
+        # writer.add_text(
+        #     "INFO",
+        #     "current error| L2 dist: {:.2f}/L2 dist 3D{:.2f}/Gaze cosine {:.2f}".format(
+        #         dist_error, gaze_error, dist3d_error
+        #     ),
+        #     global_step=opt.OTHER.global_step,
+        # )
 
 
 if __name__ == "__main__":
