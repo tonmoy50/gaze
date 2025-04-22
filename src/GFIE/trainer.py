@@ -146,7 +146,7 @@ class Trainer(object):
             l2loss_3d = self.get_3D_dist_error(
                 data, bs, pred_gheatmap, pred_gvec, gaze_target3d
             )
-            l2loss_scaler_3d = 10
+            l2loss_scaler_3d = 0
 
             total_loss = (
                 (l2_loss * 10000) + (10 * vec_loss) + (l2loss_3d * l2loss_scaler_3d)

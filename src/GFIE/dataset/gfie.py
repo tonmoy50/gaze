@@ -71,7 +71,7 @@ class GFIEDataset(Dataset):
 
         if dstype == "train":
             df = pd.read_csv(annofile_path)
-            df = df[0 : int(df.shape[0] * 0.1)]
+            df = df[0 : int(df.shape[0] * 0.25)]
         else:
             df = pd.read_csv(annofile_path)
 

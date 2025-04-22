@@ -115,14 +115,14 @@ def train_engine(opt):
         #     save_checkpoint(gazemodel, optimizer, valid_error, False, epoch, opt)
 
         # save the parameters of model with the best performance on valid dataset
-        if trainer.best_flag:
-            valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
+        # if trainer.best_flag:
+        #     valid_error = [trainer.eval_dist.avg, trainer.eval_cosine.avg]
 
-            save_checkpoint(
-                gazemodel, optimizer, valid_error, trainer.best_flag, epoch, opt
-            )
+        #     save_checkpoint(
+        #         gazemodel, optimizer, valid_error, trainer.best_flag, epoch, opt
+        #     )
 
-        time.sleep(0.03)
+        # time.sleep(0.03)
 
         dist_error, gaze_error, dist3d_error = tester.test(epoch, opt)
         print(
