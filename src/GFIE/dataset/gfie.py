@@ -57,6 +57,7 @@ class GFIEDataset(Dataset):
 
         rgb_path = os.path.join(opt.DATASET.root_dir, opt.DATASET.rgb)
         depth_path = os.path.join(opt.DATASET.root_dir, opt.DATASET.depth)
+        custom_depth_path = opt.DATASET.custom_depth
 
         camerapara = np.load(os.path.join(opt.DATASET.root_dir, opt.DATASET.camerapara))
 
@@ -71,7 +72,7 @@ class GFIEDataset(Dataset):
 
         if dstype == "train":
             df = pd.read_csv(annofile_path)
-            df = df[0 : int(df.shape[0] * 0.25)]
+            df = df[0 : int(df.shape[0] * 0.10)]
         else:
             df = pd.read_csv(annofile_path)
 
@@ -97,6 +98,7 @@ class GFIEDataset(Dataset):
 
         self.rgb_path = rgb_path
         self.depth_path = depth_path
+        self.custom_depth_path = custom_depth_path
         self.camerapara = camerapara
 
         self.input_size = opt.TRAIN.input_size
@@ -147,14 +149,44 @@ class GFIEDataset(Dataset):
             "scene{}".format(scene_id),
             "{:04}.npy".format(frame_index),
         )
+        # if self.dstype == "train":
+        #     depth_path = os.path.join(
+        #         self.custom_depth_path,
+        #         "scene{}".format(scene_id),
+        #         "{:04}.npy".format(frame_index),
+        #     )
+        # else:
+        #     depth_path = os.path.join(
+        #         self.depth_path,
+        #         self.dstype,
+        #         "scene{}".format(scene_id),
+        #         "{:04}.npy".format(frame_index),
+        #     )
 
         # load the rgb image
         img = Image.open(rgb_path)
         img = img.convert("RGB")
+        # depthimg = img.copy()
         width, height = img.size
         org_width, org_height = width, height
 
+        # # load the depth image
+        # depthimg = np.load(depth_path)
+        # # replace the invalid value with 0
+        # depthimg[np.isnan(depthimg)] = 0
+        # depthimg = depthimg.astype(np.float32)
+        # depthimg = Image.fromarray(depthimg)
+
         # load the depth image
+        # if self.dstype == "train":
+        #     # depthimg = self.get_depth_map(rgb_path)
+        #     # depthimg = cv2.imread(rgb_path)
+        #     # depthimg = self.depth_model.infer_image(depthimg)
+        #     depthimg = os.path.join(
+        #         "/nobackup/nhaldert/gfie_depth/train/scene{}".format(scene_id),
+        #         "{:04}.npy".format(frame_index),
+        #     )
+        # else:
         depthimg = np.load(depth_path)
         # replace the invalid value with 0
         depthimg[np.isnan(depthimg)] = 0

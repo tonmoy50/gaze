@@ -24,7 +24,7 @@ from trainer import Trainer
 from tester import Tester
 from tensorboardX import SummaryWriter
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # Set visible GPUs
 
 
 def train_engine(opt):
@@ -71,17 +71,63 @@ def train_engine(opt):
         else:
             raise Exception("No such checkpoint file")
 
+    # Get the depth map from depth anything v2 model.
+    # model_configs = {
+    #     "vits": {
+    #         "encoder": "vits",
+    #         "features": 64,
+    #         "out_channels": [48, 96, 192, 384],
+    #     },
+    #     "vitb": {
+    #         "encoder": "vitb",
+    #         "features": 128,
+    #         "out_channels": [96, 192, 384, 768],
+    #     },
+    #     "vitl": {
+    #         "encoder": "vitl",
+    #         "features": 256,
+    #         "out_channels": [256, 512, 1024, 1024],
+    #     },
+    # }
+
+    # encoder = "vitl"  # or 'vits', 'vitb'
+    # dataset = "hypersim"  # 'hypersim' for indoor model, 'vkitti' for outdoor model
+    # max_depth = 10  # 20 for indoor model, 80 for outdoor model
+
+    # depth_model = DepthAnythingV2(**{**model_configs[encoder], "max_depth": max_depth})
+    # depth_model.load_state_dict(
+    #     torch.load(
+    #         f"/nobackup/nhaldert/depth_anything_v2_metric_{dataset}_{encoder}.pth",
+    #         map_location="cuda",
+    #     )
+    # )
+    # depth_model.eval()
+    # depth_model.to(opt.OTHER.device)
+
     dataloader = GFIELoader(opt)
+    # dataloader = GFIELoader(opt)
     train_loader = dataloader.train_loader
     val_loader = dataloader.val_loader
     test_loader = dataloader.test_loader
 
     # init trainer and validator for gazemodel
     trainer = Trainer(
-        gazemodel, criterion, optimizer, train_loader, val_loader, opt, writer=writer
+        gazemodel,
+        criterion,
+        optimizer,
+        train_loader,
+        val_loader,
+        opt,
+        writer=writer,
     )
 
-    tester = Tester(gazemodel, criterion, test_loader, opt, writer=writer)
+    tester = Tester(
+        gazemodel,
+        criterion,
+        test_loader,
+        opt,
+        writer=writer,
+    )
 
     trainer.get_best_error(best_dist_error, best_cosine_error)
 
@@ -141,6 +187,7 @@ def train_engine(opt):
 
 
 if __name__ == "__main__":
+    # mp.set_start_method("spawn")
 
     parser = argparse.ArgumentParser(description="GFIE benchmark Model")
 
@@ -165,7 +212,7 @@ if __name__ == "__main__":
 
     cfg.merge_from_file(args.cfg)
     cfg.merge_from_list(args.opts)
-
+    print(torch.cuda.is_available())
     cfg.OTHER.device = "cuda:0" if (torch.cuda.is_available() and args.gpu) else "cpu"
     print("The model running on {}".format(cfg.OTHER.device))
 

@@ -16,6 +16,7 @@ _C.DATASET = CN()
 _C.DATASET.root_dir = ""
 _C.DATASET.rgb = ""
 _C.DATASET.depth = ""
+_C.DATASET.custom_depth = ""
 _C.DATASET.camerapara = ""
 
 _C.DATASET.train = ""
@@ -67,7 +68,7 @@ _C.TRAIN.resume_add = ""
 
 # input and output resolution
 _C.TRAIN.input_size = 224
-_C.TRAIN.output_size = 64
+_C.TRAIN.output_size = 128
 
 
 # -----------------------------------------------------------------------------

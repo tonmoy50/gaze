@@ -37,7 +37,7 @@
 #   cpkt: "/extend/hzx/Model_para/GFIEpub_model/gfiemodel_11epoch.pth.tar"
 
 DATASET:
-
+  custom_depth: "/nobackup/nhaldert/datasets/GFIE_dataset/depth/train"
   root_dir: "/nfs/mareep/data/ssd1/nhaldert/datasets/GFIE_dataset"
   rgb: "rgb"
   depth: "depth"
