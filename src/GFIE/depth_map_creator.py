@@ -3,6 +3,7 @@ import torch
 import numpy as np
 import pandas as pd
 import os
+from tqdm import tqdm
 
 
 # import warnings
@@ -52,19 +53,19 @@ def get_depth_model(rgb_path):
 
 if __name__ == "__main__":
     root = "/nfs/mareep/data/ssd1/nhaldert/datasets/GFIE_dataset"
-    temp_root = "/nobackup/nhaldert/datasets/GFIE_dataset"
+    temp_root = "/nfs/wattrel/data/md0/nhaldert/gfie_depth"
     train_file = os.path.join(root, "train_annotation.txt")
 
     df_train = pd.read_csv(train_file)
-    df_train = df_train[0 : int(df_train.shape[0] * 0.10)]
+    df_train = df_train[0 : int(df_train.shape[0] * 0.25)]
     print(df_train.shape)
 
     rgb_path = os.path.join(root, "rgb", "train")
 
     model = get_depth_model(rgb_path)
 
-    for index, row in df_train.iterrows():
-        print("Processing index:", index)
+    for index, row in tqdm(df_train.iterrows(), total=df_train.shape[0]):
+        # print("Processing index:", index)
         scene_id = row["scene_id"]
         frame_index = row["frame_id"]
         img_path = os.path.join(

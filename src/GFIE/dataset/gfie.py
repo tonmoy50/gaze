@@ -72,7 +72,7 @@ class GFIEDataset(Dataset):
 
         if dstype == "train":
             df = pd.read_csv(annofile_path)
-            df = df[0 : int(df.shape[0] * 0.10)]
+            df = df[0 : int(df.shape[0] * 0.25)]
         else:
             df = pd.read_csv(annofile_path)
 
@@ -149,19 +149,19 @@ class GFIEDataset(Dataset):
             "scene{}".format(scene_id),
             "{:04}.npy".format(frame_index),
         )
-        # if self.dstype == "train":
-        #     depth_path = os.path.join(
-        #         self.custom_depth_path,
-        #         "scene{}".format(scene_id),
-        #         "{:04}.npy".format(frame_index),
-        #     )
-        # else:
-        #     depth_path = os.path.join(
-        #         self.depth_path,
-        #         self.dstype,
-        #         "scene{}".format(scene_id),
-        #         "{:04}.npy".format(frame_index),
-        #     )
+        if self.dstype == "train":
+            depth_path = os.path.join(
+                self.custom_depth_path,
+                "scene{}".format(scene_id),
+                "{:04}.npy".format(frame_index),
+            )
+        else:
+            depth_path = os.path.join(
+                self.depth_path,
+                self.dstype,
+                "scene{}".format(scene_id),
+                "{:04}.npy".format(frame_index),
+            )
 
         # load the rgb image
         img = Image.open(rgb_path)
@@ -170,12 +170,12 @@ class GFIEDataset(Dataset):
         width, height = img.size
         org_width, org_height = width, height
 
-        # # load the depth image
-        # depthimg = np.load(depth_path)
-        # # replace the invalid value with 0
-        # depthimg[np.isnan(depthimg)] = 0
-        # depthimg = depthimg.astype(np.float32)
-        # depthimg = Image.fromarray(depthimg)
+        # load the depth image
+        depthimg = np.load(depth_path)
+        # replace the invalid value with 0
+        depthimg[np.isnan(depthimg)] = 0
+        depthimg = depthimg.astype(np.float32)
+        depthimg = Image.fromarray(depthimg)
 
         # load the depth image
         # if self.dstype == "train":
@@ -183,7 +183,7 @@ class GFIEDataset(Dataset):
         #     # depthimg = cv2.imread(rgb_path)
         #     # depthimg = self.depth_model.infer_image(depthimg)
         #     depthimg = os.path.join(
-        #         "/nobackup/nhaldert/gfie_depth/train/scene{}".format(scene_id),
+        #         "/nfs/wattrel/data/md0/nhaldert/gfie_depth/train/scene{}".format(scene_id),
         #         "{:04}.npy".format(frame_index),
         #     )
         # else:

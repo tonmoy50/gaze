@@ -68,7 +68,7 @@ _C.TRAIN.resume_add = ""
 
 # input and output resolution
 _C.TRAIN.input_size = 224
-_C.TRAIN.output_size = 128
+_C.TRAIN.output_size = 64
 
 
 # -----------------------------------------------------------------------------

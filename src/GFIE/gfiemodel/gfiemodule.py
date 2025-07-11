@@ -36,104 +36,104 @@ class Encoder(nn.Module):
         return x
 
 
-# class Decoder(nn.Module):
-#     """Decoder in the Module for Generating GazeHeatmap"""
-
-#     def __init__(self):
-#         super(Decoder, self).__init__()
-
-#         self.relu = nn.ReLU(inplace=True)
-
-#         self.compress_conv1 = nn.Conv2d(
-#             2048, 1024, kernel_size=1, stride=1, padding=0, bias=False
-#         )
-#         self.compress_bn1 = nn.BatchNorm2d(1024)
-#         self.compress_conv2 = nn.Conv2d(
-#             1024, 512, kernel_size=1, stride=1, padding=0, bias=False
-#         )
-#         self.compress_bn2 = nn.BatchNorm2d(512)
-
-#         self.deconv1 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2)
-#         self.deconv_bn1 = nn.BatchNorm2d(256)
-#         self.deconv2 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2)
-#         self.deconv_bn2 = nn.BatchNorm2d(128)
-#         self.deconv3 = nn.ConvTranspose2d(128, 1, kernel_size=4, stride=2)
-#         self.deconv_bn3 = nn.BatchNorm2d(1)
-#         self.conv4 = nn.Conv2d(1, 1, kernel_size=1, stride=1)
-
-#     def forward(self, x):
-
-#         x = self.compress_conv1(x)
-#         x = self.compress_bn1(x)
-#         x = self.relu(x)
-#         x = self.compress_conv2(x)
-#         x = self.compress_bn2(x)
-#         x = self.relu(x)
-
-#         x = self.deconv1(x)
-#         x = self.deconv_bn1(x)
-#         x = self.relu(x)
-#         x = self.deconv2(x)
-#         x = self.deconv_bn2(x)
-#         x = self.relu(x)
-#         x = self.deconv3(x)
-#         x = self.deconv_bn3(x)
-#         x = self.relu(x)
-#         x = self.conv4(x)
-
-#         return x
-
-
 class Decoder(nn.Module):
-    """Decoder in the Module for Generating GazeHeatmap with 128x128 output"""
+    """Decoder in the Module for Generating GazeHeatmap"""
 
     def __init__(self):
         super(Decoder, self).__init__()
+
         self.relu = nn.ReLU(inplace=True)
 
-        self.compress_conv1 = nn.Conv2d(2048, 1024, kernel_size=1)
+        self.compress_conv1 = nn.Conv2d(
+            2048, 1024, kernel_size=1, stride=1, padding=0, bias=False
+        )
         self.compress_bn1 = nn.BatchNorm2d(1024)
-        self.compress_conv2 = nn.Conv2d(1024, 512, kernel_size=1)
+        self.compress_conv2 = nn.Conv2d(
+            1024, 512, kernel_size=1, stride=1, padding=0, bias=False
+        )
         self.compress_bn2 = nn.BatchNorm2d(512)
 
-        # Carefully designed deconvs to reach 128x128 from 7x7
-        self.deconv1 = nn.ConvTranspose2d(
-            512, 256, kernel_size=4, stride=2, padding=1
-        )  # 7 → 14
+        self.deconv1 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2)
         self.deconv_bn1 = nn.BatchNorm2d(256)
-        self.deconv2 = nn.ConvTranspose2d(
-            256, 128, kernel_size=4, stride=2, padding=1
-        )  # 14 → 28
+        self.deconv2 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2)
         self.deconv_bn2 = nn.BatchNorm2d(128)
-        self.deconv3 = nn.ConvTranspose2d(
-            128, 64, kernel_size=4, stride=2, padding=1
-        )  # 28 → 56
-        self.deconv_bn3 = nn.BatchNorm2d(64)
-        self.deconv4 = nn.ConvTranspose2d(
-            64, 32, kernel_size=4, stride=2, padding=1
-        )  # 56 → 112
-        self.deconv_bn4 = nn.BatchNorm2d(32)
-        self.deconv5 = nn.ConvTranspose2d(
-            32, 1, kernel_size=3, stride=2, padding=1, output_padding=1
-        )  # 112 → 224
-
-        # Reduce back to 128x128 with interpolation
-        self.resize = nn.Upsample(size=(128, 128), mode="bilinear", align_corners=False)
-        self.final_conv = nn.Conv2d(1, 1, kernel_size=1)
+        self.deconv3 = nn.ConvTranspose2d(128, 1, kernel_size=4, stride=2)
+        self.deconv_bn3 = nn.BatchNorm2d(1)
+        self.conv4 = nn.Conv2d(1, 1, kernel_size=1, stride=1)
 
     def forward(self, x):
-        x = self.relu(self.compress_bn1(self.compress_conv1(x)))
-        x = self.relu(self.compress_bn2(self.compress_conv2(x)))
 
-        x = self.relu(self.deconv_bn1(self.deconv1(x)))  # 14
-        x = self.relu(self.deconv_bn2(self.deconv2(x)))  # 28
-        x = self.relu(self.deconv_bn3(self.deconv3(x)))  # 56
-        x = self.relu(self.deconv_bn4(self.deconv4(x)))  # 112
-        x = self.relu(self.deconv5(x))  # 224
+        x = self.compress_conv1(x)
+        x = self.compress_bn1(x)
+        x = self.relu(x)
+        x = self.compress_conv2(x)
+        x = self.compress_bn2(x)
+        x = self.relu(x)
 
-        x = self.resize(x)  # resize to 128x128
-        x = self.final_conv(x)
+        x = self.deconv1(x)
+        x = self.deconv_bn1(x)
+        x = self.relu(x)
+        x = self.deconv2(x)
+        x = self.deconv_bn2(x)
+        x = self.relu(x)
+        x = self.deconv3(x)
+        x = self.deconv_bn3(x)
+        x = self.relu(x)
+        x = self.conv4(x)
+
         return x
+
+
+# class Decoder(nn.Module):
+#     """Decoder in the Module for Generating GazeHeatmap with 128x128 output"""
+
+#     def __init__(self):
+#         super(Decoder, self).__init__()
+#         self.relu = nn.ReLU(inplace=True)
+
+#         self.compress_conv1 = nn.Conv2d(2048, 1024, kernel_size=1)
+#         self.compress_bn1 = nn.BatchNorm2d(1024)
+#         self.compress_conv2 = nn.Conv2d(1024, 512, kernel_size=1)
+#         self.compress_bn2 = nn.BatchNorm2d(512)
+
+#         # Carefully designed deconvs to reach 128x128 from 7x7
+#         self.deconv1 = nn.ConvTranspose2d(
+#             512, 256, kernel_size=4, stride=2, padding=1
+#         )  # 7 → 14
+#         self.deconv_bn1 = nn.BatchNorm2d(256)
+#         self.deconv2 = nn.ConvTranspose2d(
+#             256, 128, kernel_size=4, stride=2, padding=1
+#         )  # 14 → 28
+#         self.deconv_bn2 = nn.BatchNorm2d(128)
+#         self.deconv3 = nn.ConvTranspose2d(
+#             128, 64, kernel_size=4, stride=2, padding=1
+#         )  # 28 → 56
+#         self.deconv_bn3 = nn.BatchNorm2d(64)
+#         self.deconv4 = nn.ConvTranspose2d(
+#             64, 32, kernel_size=4, stride=2, padding=1
+#         )  # 56 → 112
+#         self.deconv_bn4 = nn.BatchNorm2d(32)
+#         self.deconv5 = nn.ConvTranspose2d(
+#             32, 1, kernel_size=3, stride=2, padding=1, output_padding=1
+#         )  # 112 → 224
+
+#         # Reduce back to 128x128 with interpolation
+#         self.resize = nn.Upsample(size=(128, 128), mode="bilinear", align_corners=False)
+#         self.final_conv = nn.Conv2d(1, 1, kernel_size=1)
+
+#     def forward(self, x):
+#         x = self.relu(self.compress_bn1(self.compress_conv1(x)))
+#         x = self.relu(self.compress_bn2(self.compress_conv2(x)))
+
+#         x = self.relu(self.deconv_bn1(self.deconv1(x)))  # 14
+#         x = self.relu(self.deconv_bn2(self.deconv2(x)))  # 28
+#         x = self.relu(self.deconv_bn3(self.deconv3(x)))  # 56
+#         x = self.relu(self.deconv_bn4(self.deconv4(x)))  # 112
+#         x = self.relu(self.deconv5(x))  # 224
+
+#         x = self.resize(x)  # resize to 128x128
+#         x = self.final_conv(x)
+#         return x
 
 
 class EGDModule(nn.Module):
