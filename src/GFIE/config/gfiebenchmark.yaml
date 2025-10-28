@@ -48,7 +48,7 @@ DATASET:
   test: "test_annotation.txt"
 
 
-  train_batch_size: 32
+  train_batch_size: 128
 
 MODEL:
   backboneptpath: "./models"
